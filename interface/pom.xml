@@ -12,6 +12,7 @@
 
     <packaging>jar</packaging>
 
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>

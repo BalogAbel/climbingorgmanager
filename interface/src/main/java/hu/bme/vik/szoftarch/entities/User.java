@@ -11,8 +11,27 @@ import java.util.Date;
  */
 @Entity
 @Data
+@NamedQueries({
+        @NamedQuery(
+                name = User.GET_BY_USERNAME,
+                query = "select u from User u where u.userName = :username"
+        ),
+        @NamedQuery(
+                name = User.GET_ALL,
+                query = "select u from User u"
+        ),
+        @NamedQuery(
+                name = User.GET_BY_ID,
+                query = "select u from User u where u.id = :id"
+        ),
+})
 public class User {
-    @Id @GeneratedValue
+    public static final String GET_BY_USERNAME = "User.getByUsername";
+    public static final String GET_ALL = "User.getAll";
+    public static final String GET_BY_ID = "User.getById";
+
+    @Id
+    @GeneratedValue
     private Long id;
 
     @Size(min = 4, max = 30)
