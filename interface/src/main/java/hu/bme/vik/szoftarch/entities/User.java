@@ -23,7 +23,7 @@ import java.util.Date;
         @NamedQuery(
                 name = User.GET_BY_ID,
                 query = "select u from User u where u.id = :id"
-        ),
+        )
 })
 public class User {
     public static final String GET_BY_USERNAME = "User.getByUsername";
