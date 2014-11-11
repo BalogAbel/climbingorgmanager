@@ -1,0 +1,28 @@
+.registration {
+    width: 600px;
+    margin-top: 50px;
+}
+.registration h1 {
+    padding-top: 0;
+    margin-top: 0;
+ }
+
+.registration label{
+    display: block;
+    color: grey;
+    height: 30px;
+    font-size: 15px;
+}
+
+.registration input[type=text], input[type=password] {
+    height: 35px;
+    float: right;
+    display: inline;
+    width: 400px;
+}
+
+.registration input[type=submit] {
+    margin-top: 20px;
+    margin-left: 200px;
+    width: 200px
+}

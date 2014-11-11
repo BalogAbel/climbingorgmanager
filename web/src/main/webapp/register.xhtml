@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+        xmlns="http://www.w3.org/1999/xhtml">
+<h:head>
+    <title>Climbing Organization Manager</title>
+    <h:outputStylesheet name="login.css" library="css"/>
+    <h:outputStylesheet name="registration.css" library="css"/>
+</h:head>
+<h:body>
+    <div class="login-card registration">
+        <h1>Registration</h1><br/>
+
+        <h:form>
+            <h:outputLabel value="Username:">
+                <h:inputText a:placeholder="Username"/>
+            </h:outputLabel>
+            <br/>
+            <h:outputLabel value="Password:">
+                <h:inputSecret a:placeholder="Password"/>
+            </h:outputLabel>
+            <br/>
+            <h:outputLabel value="Confirm password:">
+                <h:inputSecret a:placeholder="Confirm password"/>
+            </h:outputLabel>
+            <br/>
+            <h:outputLabel value="Email:">
+                <h:inputText a:placeholder="Email"/>
+            </h:outputLabel>
+            <br/>
+            <h:outputLabel value="First name:">
+                <h:inputText a:placeholder="First name"/>
+            </h:outputLabel>
+            <br/>
+            <h:outputLabel value="Last name:">
+                <h:inputText a:placeholder="Last name"/>
+            </h:outputLabel>
+            <br/>
+            <h:outputLabel value="Address:">
+                <h:inputText a:placeholder="Address"/>
+            </h:outputLabel>
+            <h:commandButton value="register" styleClass="login login-submit"/>
+        </h:form>
+
+
+        <div class="login-help">
+            Already a user?&#160;
+            <h:outputLink value="login.xhml">Login</h:outputLink>
+        </div>
+    </div>
+
+</h:body>
+</html>
