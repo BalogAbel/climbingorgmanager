@@ -2,7 +2,6 @@ package hu.bme.vik.szoftarch.entities;
 
 import lombok.Data;
 
-import javax.annotation.Generated;
 import javax.persistence.*;
 import java.util.Date;
 

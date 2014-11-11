@@ -15,33 +15,33 @@
 
         <h:form>
             <h:outputLabel value="Username:">
-                <h:inputText a:placeholder="Username"/>
+                <h:inputText value="#{registrationBean.user.userName}" a:placeholder="Username"/>
             </h:outputLabel>
             <br/>
             <h:outputLabel value="Password:">
-                <h:inputSecret a:placeholder="Password"/>
+                <h:inputSecret value="#{registrationBean.user.password}" a:placeholder="Password"/>
             </h:outputLabel>
             <br/>
             <h:outputLabel value="Confirm password:">
-                <h:inputSecret a:placeholder="Confirm password"/>
+                <h:inputSecret value="#{registrationBean.password2}" a:placeholder="Confirm password"/>
             </h:outputLabel>
             <br/>
             <h:outputLabel value="Email:">
-                <h:inputText a:placeholder="Email"/>
+                <h:inputText value="#{registrationBean.user.email}" a:placeholder="Email"/>
             </h:outputLabel>
             <br/>
             <h:outputLabel value="First name:">
-                <h:inputText a:placeholder="First name"/>
+                <h:inputText value="#{registrationBean.user.userData.firstName}" a:placeholder="First name"/>
             </h:outputLabel>
             <br/>
             <h:outputLabel value="Last name:">
-                <h:inputText a:placeholder="Last name"/>
+                <h:inputText value="#{registrationBean.user.userData.lastName}" a:placeholder="Last name"/>
             </h:outputLabel>
             <br/>
             <h:outputLabel value="Address:">
-                <h:inputText a:placeholder="Address"/>
+                <h:inputText value="#{registrationBean.user.userData.address}" a:placeholder="Address"/>
             </h:outputLabel>
-            <h:commandButton value="register" styleClass="login login-submit"/>
+            <h:commandButton value="register" styleClass="login login-submit" action="#{registrationBean.register}"/>
         </h:form>
 
 

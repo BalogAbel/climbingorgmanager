@@ -1,4 +1,4 @@
-package hu.bme.vik.szoftarch.services;
+package hu.bme.vik.szoftarch.services.services;
 
 import java.util.List;
 
