@@ -6,9 +6,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-/**
- * Created by Abel on 2014.11.02..
- */
 @Entity
 @Data
 @NamedQueries({
@@ -37,8 +34,11 @@ public class User {
     @Size(min = 4, max = 30)
     private String userName;
 
-    @Size(min = 7, max = 256)
+    @Size(min = 6, max = 256)
     private String password;
+
+    @Size(min = 6, max = 256)
+    private String email;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastLoginOn;
