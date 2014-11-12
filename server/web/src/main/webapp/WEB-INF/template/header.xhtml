@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html">
 <body>
 
 <ui:composition>
     <h1>Climbing Organization Manager</h1>
-
+    <h:form>
+        Welcome,&#160;<h:outputText value="#{authBean.user.userName}"/>! &#160;
+        <h:commandLink action="#{authBean.logout}" value="Logout"/>
+    </h:form>
 </ui:composition>
 
 </body>

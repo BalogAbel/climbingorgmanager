@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html>
 <html
-        xmlns:h="http://java.sun.com/jsf/html"
-        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
         xmlns="http://www.w3.org/1999/xhtml">
 <h:head>
     <title>Climbing Organization Manager</title>
     <h:outputStylesheet name="login.css" library="css"/>
 </h:head>
-<body>
+
+<h:body>
 <div class="login-card">
     <h1>Log-in</h1><br/>
-    <h:form>
-        <input type="text" name="user" placeholder="Username"/>
-        <input type="password" name="pass" placeholder="Password"/>
-        <input type="submit" name="login" class="login login-submit" value="login"/>
+    <h:form id="loginForm">
+        <h:messages styleClass="error"/>
+        <h:inputText id="user" value="#{authBean.username}" a:placeholder="Username"/>
+        <h:inputSecret id="password" value="#{authBean.password}" a:placeholder="Password"/>
+        <h:commandButton action="#{authBean.login}" styleClass="login login-submit" value="login"/>
     </h:form>
 
     <div class="login-help">
@@ -22,5 +24,5 @@
     </div>
 </div>
 
-</body>
+</h:body>
 </html>
