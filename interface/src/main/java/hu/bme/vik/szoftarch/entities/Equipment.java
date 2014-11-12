@@ -6,16 +6,29 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
-/**
- * Created by Abel on 2014.11.02..
- */
 @Data
 @Entity
+@NamedQueries({
+		@NamedQuery(
+				name = Equipment.GET_ALL,
+				query = "select e from Equipment e"
+		),
+		@NamedQuery(
+				name = Equipment.GET_BY_ID,
+				query = "select e from Equipment e where e.id = :id"
+		)
+})
 public class Equipment implements Serializable {
+
+	public static final String GET_ALL = "Equipment.getAll";
+	public static final String GET_BY_ID = "Equipment.getById";
+
     @Id
     @GeneratedValue
     private Long id;
@@ -35,6 +48,5 @@ public class Equipment implements Serializable {
     @ManyToOne
     @NotNull
     private EquipmentType equipmentType;
-
 
 }

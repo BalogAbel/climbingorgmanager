@@ -7,6 +7,8 @@
 		<jta-data-source>java:jboss/datasources/MySQLDS</jta-data-source>
 		<class>hu.bme.vik.szoftarch.entities.User</class>
 		<class>hu.bme.vik.szoftarch.entities.UserData</class>
+		<class>hu.bme.vik.szoftarch.entities.Equipment</class>
+		<class>hu.bme.vik.szoftarch.entities.EquipmentType</class>
 		<properties>
 			<!-- Properties for Hibernate -->
 			<!--<property name="hibernate.archive.autodetection" value="class, hbm"/>-->
