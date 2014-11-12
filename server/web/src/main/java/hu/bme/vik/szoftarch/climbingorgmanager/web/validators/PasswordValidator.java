@@ -11,23 +11,22 @@ import javax.faces.validator.ValidatorException;
 @FacesValidator("passwordValidator")
 public class PasswordValidator implements Validator {
 
-    @Override
-    public void validate(FacesContext context, UIComponent component,
-                         Object value) throws ValidatorException {
+	@Override
+	public void validate(FacesContext context, UIComponent component,
+			Object value) throws ValidatorException {
 
-        String password = value.toString();
+		String password = value.toString();
 
-        UIInput uiInputPassword2 = (UIInput) component.getAttributes()
-                .get("password2");
-        String password2 = uiInputPassword2.getSubmittedValue()
-                .toString();
+		UIInput uiInputPassword2 = (UIInput) component.getAttributes()
+				.get("password2");
+		String password2 = uiInputPassword2.getSubmittedValue()
+				.toString();
 
+		if (!password.equals(password2)) {
+			uiInputPassword2.setValid(false);
+			throw new ValidatorException(new FacesMessage(
+					"password and its confirmation does not match"));
+		}
 
-        if (!password.equals(password2)) {
-            uiInputPassword2.setValid(false);
-            throw new ValidatorException(new FacesMessage(
-                    "password and its confirmation does not match"));
-        }
-
-    }
+	}
 }

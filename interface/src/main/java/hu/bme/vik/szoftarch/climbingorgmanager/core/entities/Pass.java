@@ -1,9 +1,10 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.core.entities;
 
-import lombok.Data;
+import java.io.Serializable;
 
 import javax.persistence.Entity;
-import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * Created by Abel on 2014.11.02..
@@ -11,5 +12,5 @@ import java.io.Serializable;
 @Data
 @Entity
 public class Pass extends Ticket implements Serializable {
-    private int timeLeft;
+	private int timeLeft;
 }

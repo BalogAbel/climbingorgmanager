@@ -2,6 +2,7 @@ package hu.bme.vik.szoftarch.climbingorgmanager.core.entities;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -51,7 +52,7 @@ public class Equipment implements Serializable {
 	@NotNull
 	private EquipmentType equipmentType;
 
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL)
 	private Rental actualRental;
 
 }

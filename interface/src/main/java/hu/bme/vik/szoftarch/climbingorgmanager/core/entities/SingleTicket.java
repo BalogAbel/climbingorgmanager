@@ -1,9 +1,10 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.core.entities;
 
-import lombok.Data;
+import java.io.Serializable;
 
 import javax.persistence.Entity;
-import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * Created by Abel on 2014.11.02..
