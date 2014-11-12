@@ -3,6 +3,7 @@ package hu.bme.vik.szoftarch.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -15,11 +16,14 @@ public class Ticket {
     private Long id;
 
     @ManyToOne
+    @NotNull
     private User owner;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date boughtOn;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date validUntil;
 }

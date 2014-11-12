@@ -3,6 +3,7 @@ package hu.bme.vik.szoftarch.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -37,24 +38,27 @@ public class User {
     private Long id;
 
     @Size(min = 4, max = 30)
+    @NotNull
     private String userName;
 
     @Size(min = 6, max = 256)
+    @NotNull
     private String password;
 
     @Size(min = 6, max = 256)
+    @NotNull
     private String email;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date lastLoginOn;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date registeredOn;
 
-    @Size(min = 1, max = 256)
-    private String salt;
-
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @NotNull
     private UserData userData;
 
 

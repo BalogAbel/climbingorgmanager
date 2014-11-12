@@ -3,6 +3,7 @@ package hu.bme.vik.szoftarch.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -16,15 +17,19 @@ public class Rental {
     private Long id;
 
     @ManyToOne
+    @NotNull
     private User user;
 
     @ManyToOne
+    @NotNull
     private Equipment equipment;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date rentedOn;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @NotNull
     private Date rentedUntil;
 
     @Temporal(TemporalType.TIMESTAMP)
