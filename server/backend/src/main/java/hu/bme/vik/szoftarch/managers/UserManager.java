@@ -54,6 +54,9 @@ public class UserManager {
         if (users.size() > 0) {
             throw new EmailAlreadyRegisteredException();
         }
+        BasicPasswordEncryptor encryptor = new BasicPasswordEncryptor();
+        String encryptedPassword = encryptor.encryptPassword(user.getPassword());
+        user.setPassword(encryptedPassword);
 		entityManager.merge(user);
 	}
 

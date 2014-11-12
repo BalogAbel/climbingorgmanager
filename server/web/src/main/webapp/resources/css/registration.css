@@ -5,24 +5,34 @@
 .registration h1 {
     padding-top: 0;
     margin-top: 0;
- }
+}
+
+.registration .error {
+    position: relative;
+    top: -10px;
+    padding-left: 150px;
+    margin-bottom: 20px;
+    color: red;
+    font-size: 12px;
+}
 
 .registration label{
-    display: block;
+    width: 150px;
+    display: inline-block;
     color: grey;
     height: 30px;
     font-size: 15px;
 }
 
 .registration input[type=text], input[type=password] {
+    /*float: right;*/
     height: 35px;
-    float: right;
-    display: inline;
     width: 400px;
 }
 
 .registration input[type=submit] {
     margin-top: 20px;
-    margin-left: 200px;
-    width: 200px
+    margin-left: 150px;
+    width: 200px;
+    font-size: 18px;
 }
