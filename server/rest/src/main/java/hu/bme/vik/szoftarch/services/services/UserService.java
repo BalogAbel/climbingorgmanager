@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import hu.bme.vik.szoftarch.entities.User;
+import hu.bme.vik.szoftarch.exceptions.EmailAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.exceptions.NoSuchUserException;
 import hu.bme.vik.szoftarch.exceptions.UsernameAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.managers.UserManager;
@@ -36,7 +37,9 @@ public class UserService {
 		try {
 			manager.addUser(user);
 		} catch (UsernameAlreadyRegisteredException e) {
-			return "Already registered";
+			return "Username already registered";
+		} catch (EmailAlreadyRegisteredException e) {
+			return "Email already registered!";
 		}
 		return "Hello " + user.getUserName();
 	}
