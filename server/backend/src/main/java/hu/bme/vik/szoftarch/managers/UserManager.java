@@ -1,5 +1,6 @@
 package hu.bme.vik.szoftarch.managers;
 
+import hu.bme.vik.szoftarch.exceptions.EmailAlreadyRegisteredException;
 import org.jasypt.util.password.BasicPasswordEncryptor;
 
 import java.util.List;
@@ -40,28 +41,34 @@ public class UserManager {
 		return user;
 	}
 
-	public void addUser(User user) throws UsernameAlreadyRegisteredException {
-		TypedQuery<User> query = entityManager.createNamedQuery(User.GET_BY_USERNAME, User.class);
-		query.setParameter("username", user.getUserName());
-		List<User> users = query.getResultList();
-		if (users.size() > 0) {
-			throw new UsernameAlreadyRegisteredException();
-		}
+	public void addUser(User user) throws UsernameAlreadyRegisteredException, EmailAlreadyRegisteredException {
+        TypedQuery<User> query = entityManager.createNamedQuery(User.GET_BY_USERNAME, User.class);
+        query.setParameter("username", user.getUserName());
+        List<User> users = query.getResultList();
+        if (users.size() > 0) {
+            throw new UsernameAlreadyRegisteredException();
+        }
+        query = entityManager.createNamedQuery(User.GET_BY_EMAIL, User.class);
+        query.setParameter("email", user.getEmail());
+        users = query.getResultList();
+        if (users.size() > 0) {
+            throw new EmailAlreadyRegisteredException();
+        }
 		entityManager.merge(user);
 	}
 
-	public User getUserById(long id) throws NoSuchUserException {
-		TypedQuery<User> query = entityManager.createNamedQuery(User.GET_BY_ID, User.class);
-		query.setParameter("id", id);
-		List<User> users = query.getResultList();
-		if (users.size() != 1) {
-			throw new NoSuchUserException();
-		}
+    public User getUserById(long id) throws NoSuchUserException {
+        TypedQuery<User> query = entityManager.createNamedQuery(User.GET_BY_ID, User.class);
+        query.setParameter("id", id);
+        List<User> users = query.getResultList();
+        if (users.size() != 1) {
+            throw new NoSuchUserException();
+        }
 
-		return users.get(0);
-	}
+        return users.get(0);
+    }
 
-	public List<User> getUsers() {
+    public List<User> getUsers() {
 		return entityManager.createNamedQuery(User.GET_ALL, User.class).getResultList();
 	}
 

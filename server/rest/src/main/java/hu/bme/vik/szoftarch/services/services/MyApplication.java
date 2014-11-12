@@ -1,4 +1,4 @@
-package hu.bme.vik.szoftarch;
+package hu.bme.vik.szoftarch.services.services;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;

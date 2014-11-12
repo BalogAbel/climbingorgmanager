@@ -14,6 +14,10 @@ import java.util.Date;
                 query = "select u from User u where u.userName = :username"
         ),
         @NamedQuery(
+                name = User.GET_BY_EMAIL,
+                query = "select u from User u where u.email = :email"
+        ),
+        @NamedQuery(
                 name = User.GET_ALL,
                 query = "select u from User u"
         ),
@@ -24,6 +28,7 @@ import java.util.Date;
 })
 public class User {
     public static final String GET_BY_USERNAME = "User.getByUsername";
+    public static final String GET_BY_EMAIL = "User.getByEmail";
     public static final String GET_ALL = "User.getAll";
     public static final String GET_BY_ID = "User.getById";
 
