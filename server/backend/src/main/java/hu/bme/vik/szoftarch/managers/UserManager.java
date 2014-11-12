@@ -3,6 +3,7 @@ package hu.bme.vik.szoftarch.managers;
 import hu.bme.vik.szoftarch.exceptions.EmailAlreadyRegisteredException;
 import org.jasypt.util.password.BasicPasswordEncryptor;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.ejb.Local;
@@ -18,7 +19,7 @@ import hu.bme.vik.szoftarch.exceptions.UsernameAlreadyRegisteredException;
 
 @Local
 @Stateless
-public class UserManager {
+public class UserManager implements Serializable{
 
 	@PersistenceContext(unitName = "primary")
 	private EntityManager entityManager;

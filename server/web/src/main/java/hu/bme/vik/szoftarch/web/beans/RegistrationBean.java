@@ -43,6 +43,7 @@ public class RegistrationBean implements Serializable{
 
         try {
             userManager.addUser(user);
+            return "registerSuccess.xhtml";
         } catch (EmailAlreadyRegisteredException e) {
             FacesMessage facesMessage = new FacesMessage("the given email address is already in use");
             facesContext.addMessage("register:email", facesMessage);
@@ -50,7 +51,6 @@ public class RegistrationBean implements Serializable{
             FacesMessage facesMessage = new FacesMessage("the given username is already in use");
             facesContext.addMessage("register:username", facesMessage);
         }
-
-        return "registerSuccess.xhtml";
+        return "";
     }
 }
