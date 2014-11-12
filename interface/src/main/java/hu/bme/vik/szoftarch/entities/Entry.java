@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,8 +12,9 @@ import java.util.Date;
  */
 @Entity
 @Data
-public class Entry {
-    @Id @GeneratedValue
+public class Entry implements Serializable {
+    @Id
+    @GeneratedValue
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)

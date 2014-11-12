@@ -7,13 +7,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 /**
  * Created by Abel on 2014.11.02..
  */
 @Data
 @Entity
-public class UserData {
+public class UserData implements Serializable {
 
     @Id @GeneratedValue
     private Long id;

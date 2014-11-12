@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -27,7 +28,7 @@ import java.util.Date;
                 query = "select u from User u where u.id = :id"
         )
 })
-public class User {
+public class User implements Serializable{
     public static final String GET_BY_USERNAME = "User.getByUsername";
     public static final String GET_BY_EMAIL = "User.getByEmail";
     public static final String GET_ALL = "User.getAll";
