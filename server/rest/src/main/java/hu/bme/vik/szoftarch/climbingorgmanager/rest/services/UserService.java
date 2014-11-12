@@ -13,11 +13,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
-import hu.bme.vik.szoftarch.exceptions.EmailAlreadyRegisteredException;
-import hu.bme.vik.szoftarch.exceptions.NoSuchUserException;
-import hu.bme.vik.szoftarch.exceptions.UsernameAlreadyRegisteredException;
-import hu.bme.vik.szoftarch.managers.UserManager;
 
 @Path("/users")
 @Produces("application/json")

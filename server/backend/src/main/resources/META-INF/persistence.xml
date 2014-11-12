@@ -8,6 +8,7 @@
 		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User</class>
 		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.UserData</class>
 		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment</class>
+		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental</class>
 		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.EquipmentType</class>
 		<properties>
 			<!-- Properties for Hibernate -->
