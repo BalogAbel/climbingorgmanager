@@ -11,6 +11,8 @@
 		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental</class>
 		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.EquipmentType</class>
 		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token</class>
+		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Entry</class>
+		<class>hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass</class>
 		<properties>
 			<!-- Properties for Hibernate -->
 			<!--<property name="hibernate.archive.autodetection" value="class, hbm"/>-->

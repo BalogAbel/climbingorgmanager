@@ -12,9 +12,11 @@ import javax.persistence.TypedQuery;
 
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EquipmentAlreadyRentedException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchRentalException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UserNotRecognizedMemberException;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
+import lombok.Data;
 
 @Local
 @Stateless
@@ -22,6 +24,11 @@ public class RentalManager {
 
 	@PersistenceContext(unitName = "primary")
 	private EntityManager entityManager;
+
+	@Data
+	public class RentalFilter {
+		//TODO
+	}
 
 	public List<Rental> getRentals() {
 		return entityManager.createNamedQuery(Rental.GET_ALL, Rental.class).getResultList();
@@ -37,11 +44,15 @@ public class RentalManager {
 		return resultList.get(0);
 	}
 
-	public void rentEquipment(User user, Equipment equipment) throws EquipmentAlreadyRentedException {
+	public void rentEquipment(User user, Equipment equipment)
+			throws EquipmentAlreadyRentedException, UserNotRecognizedMemberException {
 		User managedUser = entityManager.merge(user);
 		Equipment managedEquipment = entityManager.merge(equipment);
 		if (managedEquipment.getActualRental() != null) {
 			throw new EquipmentAlreadyRentedException();
+		}
+		if (!managedUser.isRecognizedMember()) {
+			throw new UserNotRecognizedMemberException();
 		}
 
 		Calendar calendar = Calendar.getInstance();

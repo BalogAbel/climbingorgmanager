@@ -15,6 +15,7 @@ import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EquipmentAlre
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchRentalException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UserNotRecognizedMemberException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.EquipmentManager;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.RentalManager;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
@@ -53,6 +54,8 @@ public class RentalService {
 			rentalManager.rentEquipment(user, equipment);
 		} catch (EquipmentAlreadyRentedException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Equipment already rented.").build();
+		} catch (UserNotRecognizedMemberException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("User not recognized as member.").build();
 		}
 		return Response.status(Response.Status.OK).build();
 	}

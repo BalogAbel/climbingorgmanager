@@ -13,6 +13,7 @@ import javax.persistence.criteria.Root;
 
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentException;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Local
@@ -23,22 +24,13 @@ public class EquipmentManager {
 	private EntityManager entityManager;
 
 	@Data
+	@AllArgsConstructor
 	public static class EquipmentFilter {
-
 		private String name;
 		private Long equipmentTypeId;
 		private Boolean rented;
 		private String accessionNumber;
 		private String description;
-
-		public EquipmentFilter(String name, Long equipmentTypeId, Boolean rented, String accessionNumber,
-				String description) {
-			this.name = name;
-			this.equipmentTypeId = equipmentTypeId;
-			this.rented = rented;
-			this.accessionNumber = accessionNumber;
-			this.description = description;
-		}
 	}
 
 	public List<Equipment> getEquipments(EquipmentFilter filter) {
