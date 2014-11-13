@@ -36,11 +36,6 @@ public class AuthFilter implements ContainerRequestFilter {
 					throw new WebApplicationException(Response.Status.UNAUTHORIZED);
 				}
 			}
-
-
-
 		}
-
 	}
-
 }
