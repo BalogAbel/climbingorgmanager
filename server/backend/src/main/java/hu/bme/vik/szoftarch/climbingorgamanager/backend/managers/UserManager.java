@@ -1,24 +1,22 @@
 package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 import org.jasypt.util.password.BasicPasswordEncryptor;
-
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.List;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.List;
 
 @Local
 @Stateless
@@ -39,10 +37,11 @@ public class UserManager implements Serializable {
 
 	public Token loginRest(String username, String password) throws BadLoginCredentialsException {
 		User user = login(username, password);
+		if (!user.isAdmin()) throw new BadLoginCredentialsException();
 		Token token = new Token();
 
 		SecureRandom random = new SecureRandom();
-		token.setToken(new BigInteger(130, random).toString(32).toString());
+		token.setToken(new BigInteger(130, random).toString(32));
 		token.setUser(user);
 		entityManager.persist(token);
 		return token;
