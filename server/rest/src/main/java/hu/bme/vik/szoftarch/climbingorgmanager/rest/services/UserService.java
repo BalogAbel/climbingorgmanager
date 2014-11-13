@@ -3,20 +3,15 @@ package hu.bme.vik.szoftarch.climbingorgmanager.rest.services;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
 @Path("/users")
@@ -26,6 +21,20 @@ public class UserService {
 
 	@Inject
 	private UserManager manager;
+
+	@GET
+	@Path("/login")
+	public Response login(@QueryParam("username") String username,
+					   @QueryParam("password") String password) {
+
+		try {
+			Token token = manager.loginRest(username, password);
+			return Response.ok().entity(token).build();
+		} catch (BadLoginCredentialsException e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+
+	}
 
 	@GET
 	public List<User> getUsers() {

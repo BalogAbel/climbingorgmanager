@@ -1,8 +1,11 @@
 package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
 import org.jasypt.util.password.BasicPasswordEncryptor;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.List;
 
 import javax.ejb.Local;
@@ -23,6 +26,27 @@ public class UserManager implements Serializable {
 
 	@PersistenceContext(unitName = "primary")
 	private EntityManager entityManager;
+
+	public Token login(String token) throws BadLoginCredentialsException {
+		TypedQuery<Token> query = entityManager.createNamedQuery(Token.GET_BY_TOKEN, Token.class);
+		query.setParameter("token", token);
+		List<Token> tokens = query.getResultList();
+		if (tokens.size() != 1) {
+			throw new BadLoginCredentialsException();
+		}
+		return tokens.get(0);
+	}
+
+	public Token loginRest(String username, String password) throws BadLoginCredentialsException {
+		User user = login(username, password);
+		Token token = new Token();
+
+		SecureRandom random = new SecureRandom();
+		token.setToken(new BigInteger(130, random).toString(32).toString());
+		token.setUser(user);
+		entityManager.persist(token);
+		return token;
+	}
 
 	public User login(String username, String password) throws BadLoginCredentialsException {
 		TypedQuery<User> query = entityManager.createNamedQuery(User.GET_BY_USERNAME, User.class);
