@@ -1,19 +1,25 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.rest.services;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EquipmentAlreadyRentedException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchRentalException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.EquipmentManager;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.RentalManager;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
 @Path("/rentals")
@@ -29,7 +35,7 @@ public class RentalService {
 	private EquipmentManager equipmentManager;
 
 	@POST
-	@Path("/{userId}/{equipmentId}")
+	@Path("/rent/{userId}/{equipmentId}")
 	public Response rentEquipment(@PathParam("userId") long userId, @PathParam("equipmentId") long equipmentId) {
 		User user;
 		try {
@@ -43,7 +49,29 @@ public class RentalService {
 		} catch (NoSuchEquipmentException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("No equipment found for id.").build();
 		}
-		rentalManager.rentEquipment(user, equipment);
+		try {
+			rentalManager.rentEquipment(user, equipment);
+		} catch (EquipmentAlreadyRentedException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Equipment already rented.").build();
+		}
 		return Response.status(Response.Status.OK).build();
+	}
+
+	@POST
+	@Path("/return/{rentalId}")
+	public Response returnEquipment(@PathParam("rentalId") long rentalId) {
+		Rental rental;
+		try {
+			rental = rentalManager.getRental(rentalId);
+		} catch (NoSuchRentalException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("No rental found for id.").build();
+		}
+		rentalManager.returnEquipment(rental);
+		return Response.status(Response.Status.OK).build();
+	}
+
+	@GET
+	public List<Rental> getRentals() {
+		return rentalManager.getRentals(); //TODO remove unnecessary fields
 	}
 }

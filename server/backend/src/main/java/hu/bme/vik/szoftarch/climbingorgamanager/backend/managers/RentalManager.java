@@ -2,12 +2,16 @@ package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EquipmentAlreadyRentedException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchRentalException;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
@@ -19,9 +23,26 @@ public class RentalManager {
 	@PersistenceContext(unitName = "primary")
 	private EntityManager entityManager;
 
-	public void rentEquipment(User user, Equipment equipment) {
+	public List<Rental> getRentals() {
+		return entityManager.createNamedQuery(Rental.GET_ALL, Rental.class).getResultList();
+	}
+
+	public Rental getRental(long rentalId) throws NoSuchRentalException {
+		TypedQuery<Rental> query = entityManager.createNamedQuery(Rental.GET_BY_ID, Rental.class);
+		query.setParameter("id", rentalId);
+		List<Rental> resultList = query.getResultList();
+		if (resultList.isEmpty()) {
+			throw new NoSuchRentalException();
+		}
+		return resultList.get(0);
+	}
+
+	public void rentEquipment(User user, Equipment equipment) throws EquipmentAlreadyRentedException {
 		User managedUser = entityManager.merge(user);
 		Equipment managedEquipment = entityManager.merge(equipment);
+		if (managedEquipment.getActualRental() != null) {
+			throw new EquipmentAlreadyRentedException();
+		}
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.DAY_OF_MONTH, 7);
@@ -32,20 +53,22 @@ public class RentalManager {
 		rental.setRentedOn(new Date());
 		rental.setEquipment(managedEquipment);
 		rental.setRentedUntil(rentedUntil);
-
-		entityManager.merge(rental);
+		System.out.println("***** 1");
+		entityManager.persist(rental);
+		System.out.println("***** 2");
 
 		managedEquipment.setActualRental(rental);
 		entityManager.merge(managedEquipment);
+		System.out.println("***** 3");
 	}
 
-	public void returnEquipment(Equipment equipment) {
-		Equipment mergedEntity = entityManager.merge(equipment);
-		Rental rental = mergedEntity.getActualRental();
-		mergedEntity.setActualRental(null);
-		rental.setRentedOn(new Date());
+	public void returnEquipment(Rental rental) {
+		Rental managedRental = entityManager.merge(rental);
+		Equipment equipment = managedRental.getEquipment();
+		equipment.setActualRental(null);
+		rental.setReturnedOn(new Date());
 
-		entityManager.merge(mergedEntity);
+		entityManager.merge(equipment);
 		entityManager.merge(rental);
 	}
 }

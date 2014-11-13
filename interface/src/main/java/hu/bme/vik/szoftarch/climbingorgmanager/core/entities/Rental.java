@@ -3,33 +3,46 @@ package hu.bme.vik.szoftarch.climbingorgmanager.core.entities;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * Created by Abel on 2014.11.02..
- */
 @Data
+@EqualsAndHashCode(exclude = {"user", "equipment"})
 @Entity
+@NamedQueries({
+		@NamedQuery(
+				name = Rental.GET_ALL,
+				query = "select r from Rental r"
+		),
+		@NamedQuery(
+				name = Rental.GET_BY_ID,
+				query = "select r from Rental r where r.id = :id"
+		)
+})
 public class Rental implements Serializable {
+
+	public static final String GET_ALL = "Rental.getAll";
+	public static final String GET_BY_ID = "Rental.byId";
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@NotNull
 	private User user;
 
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne
 	@NotNull
 	private Equipment equipment;
 
