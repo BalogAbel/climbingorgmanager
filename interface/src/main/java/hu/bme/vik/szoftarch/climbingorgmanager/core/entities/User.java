@@ -80,7 +80,8 @@ public class User implements Serializable {
 	@NotNull
 	private UserData userData;
 
-	private boolean isAdmin = false;
+	@NotNull
+	private boolean admin = false;
 
 	@Transient
 	@Setter(AccessLevel.PRIVATE)
