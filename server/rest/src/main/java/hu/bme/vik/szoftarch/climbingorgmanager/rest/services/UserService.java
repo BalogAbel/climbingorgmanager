@@ -50,15 +50,15 @@ public class UserService {
 	}
 
 	@POST
-	public String addUser(User user) {
+	public Response addUser(User user) {
 		try {
 			manager.addUser(user);
 		} catch (UsernameAlreadyRegisteredException e) {
-			return "Username already registered";
+			return Response.status(Response.Status.BAD_REQUEST).entity("Username already registered").build();
 		} catch (EmailAlreadyRegisteredException e) {
-			return "Email already registered!";
+			return Response.status(Response.Status.BAD_REQUEST).entity("Email already registered!").build();
 		}
-		return "Hello " + user.getUserName();
+		return Response.status(Response.Status.OK).build();
 	}
 
 	@PUT
