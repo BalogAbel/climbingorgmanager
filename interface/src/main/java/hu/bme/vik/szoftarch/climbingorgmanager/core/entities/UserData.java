@@ -8,12 +8,16 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Created by Abel on 2014.11.02..
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class UserData implements Serializable {
 

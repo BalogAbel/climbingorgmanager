@@ -1,18 +1,33 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.core.entities;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Setter;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
+import javax.persistence.PostLoad;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @NamedQueries({
 		@NamedQuery(
 				name = User.GET_BY_USERNAME,
@@ -77,6 +92,5 @@ public class User implements Serializable {
 		cal.add(Calendar.MONTH, -6);
 		recognizedMember = registeredOn.compareTo(cal.getTime()) < 0;
 	}
-
 
 }

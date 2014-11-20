@@ -105,6 +105,9 @@ public class LoginFrame extends JFrame {
 							Token token = response.readEntity(Token.class);
 							System.out.println("Token: " + token.getToken());
 							System.out.println("User: " + token.getUser().getUserName());
+							MainFrame frame = new MainFrame();
+							frame.setVisible(true);
+							LoginFrame.this.setVisible(false);
 						}
 
 						@Override
