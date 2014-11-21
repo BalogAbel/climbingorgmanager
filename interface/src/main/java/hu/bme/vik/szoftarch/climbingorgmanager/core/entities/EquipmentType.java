@@ -1,21 +1,23 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.core.entities;
 
-import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import lombok.Data;
 
-/**
- * Created by Abel on 2014.11.02..
- */
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+
 @Data
 @Entity
+@NamedQueries({
+		@NamedQuery(
+				name = EquipmentType.GET_ALL,
+				query = "select et from EquipmentType et"
+		)
+})
 public class EquipmentType implements Serializable {
+	public static final String GET_ALL = "EquipmentType.getAll";
+
 	@Id
 	@GeneratedValue
 	private Long id;
