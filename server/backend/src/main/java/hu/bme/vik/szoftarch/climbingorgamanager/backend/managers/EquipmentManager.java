@@ -1,6 +1,7 @@
 package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentTypeException;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.EquipmentType;
 import lombok.AllArgsConstructor;
@@ -84,6 +85,14 @@ public class EquipmentManager {
 
 	public List<EquipmentType> getEquipmentTypes() {
 		return entityManager.createNamedQuery(EquipmentType.GET_ALL, EquipmentType.class).getResultList();
+	}
+
+	public EquipmentType getEquipmentTypeById(long id) throws NoSuchEquipmentTypeException {
+		TypedQuery<EquipmentType> query = entityManager.createNamedQuery(EquipmentType.GET_BY_ID, EquipmentType.class);
+		query.setParameter("id", id);
+		List<EquipmentType> resultList = query.getResultList();
+		if (resultList.size() != 1) throw new NoSuchEquipmentTypeException();
+		return resultList.get(0);
 	}
 
 	@Data

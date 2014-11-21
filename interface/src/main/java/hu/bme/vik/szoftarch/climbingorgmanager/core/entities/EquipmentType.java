@@ -13,10 +13,15 @@ import java.io.Serializable;
 		@NamedQuery(
 				name = EquipmentType.GET_ALL,
 				query = "select et from EquipmentType et"
+		),
+		@NamedQuery(
+				name = EquipmentType.GET_BY_ID,
+				query = "select et from EquipmentType et where et.id = :id"
 		)
 })
 public class EquipmentType implements Serializable {
 	public static final String GET_ALL = "EquipmentType.getAll";
+	public static final String GET_BY_ID = "EquipmentType.getById";
 
 	@Id
 	@GeneratedValue
