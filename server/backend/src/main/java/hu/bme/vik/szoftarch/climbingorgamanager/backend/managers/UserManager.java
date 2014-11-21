@@ -84,7 +84,7 @@ public class UserManager implements Serializable {
 		BasicPasswordEncryptor encryptor = new BasicPasswordEncryptor();
 		String encryptedPassword = encryptor.encryptPassword(user.getPassword());
 		user.setPassword(encryptedPassword);
-		entityManager.merge(user);
+		entityManager.persist(user);
 	}
 
 	public User getUserById(long id) throws NoSuchUserException {
