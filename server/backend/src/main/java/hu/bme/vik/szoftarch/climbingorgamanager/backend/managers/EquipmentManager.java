@@ -75,6 +75,10 @@ public class EquipmentManager {
 	}
 
 	public void addEquipment(Equipment equipment) {
+		entityManager.persist(equipment);
+	}
+
+	public void editEquipment(Equipment equipment) {
 		entityManager.merge(equipment);
 	}
 
