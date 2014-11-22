@@ -75,6 +75,27 @@ public class RentalService {
 
 	@GET
 	public List<Rental> getRentals() {
-		return rentalManager.getRentals(); //TODO remove unnecessary fields
+		List<Rental> rentals = rentalManager.getRentals();
+		for (Rental rental : rentals) {
+			Equipment equipment = rental.getEquipment();
+			equipment.setActualRental(null);
+		}
+		return rentals;
+	}
+
+	@GET
+	@Path("{userId}")
+	public Response getRentals(@PathParam("userId") long userId) {
+		try {
+			User user = userManager.getUserById(userId);
+			List<Rental> rentals = rentalManager.getRentalsForUser(user);
+			for (Rental rental : rentals) {
+				Equipment equipment = rental.getEquipment();
+				equipment.setActualRental(null);
+			}
+			return Response.status(Response.Status.OK).entity(rentals).build();
+		} catch (NoSuchUserException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("No user found for id.").build();
+		}
 	}
 }

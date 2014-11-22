@@ -27,12 +27,17 @@ import lombok.EqualsAndHashCode;
 		@NamedQuery(
 				name = Rental.GET_BY_ID,
 				query = "select r from Rental r where r.id = :id"
+		),
+		@NamedQuery(
+				name = Rental.GET_BY_USER,
+				query = "select r from Rental r where r.user = :user"
 		)
 })
 public class Rental implements Serializable {
 
 	public static final String GET_ALL = "Rental.getAll";
 	public static final String GET_BY_ID = "Rental.byId";
+	public static final String GET_BY_USER = "Rental.byUser";
 
 	@Id
 	@GeneratedValue

@@ -16,7 +16,6 @@ import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UserNotRecogn
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
-import lombok.Data;
 
 @Local
 @Stateless
@@ -24,11 +23,6 @@ public class RentalManager {
 
 	@PersistenceContext(unitName = "primary")
 	private EntityManager entityManager;
-
-	@Data
-	public class RentalFilter {
-		//TODO
-	}
 
 	public List<Rental> getRentals() {
 		return entityManager.createNamedQuery(Rental.GET_ALL, Rental.class).getResultList();
@@ -81,5 +75,12 @@ public class RentalManager {
 
 		entityManager.merge(equipment);
 		entityManager.merge(rental);
+	}
+
+	public List<Rental> getRentalsForUser(User user) {
+		User managedUser = entityManager.merge(user);
+		TypedQuery<Rental> query = entityManager.createNamedQuery(Rental.GET_BY_USER, Rental.class);
+		query.setParameter("user", managedUser);
+		return query.getResultList();
 	}
 }
