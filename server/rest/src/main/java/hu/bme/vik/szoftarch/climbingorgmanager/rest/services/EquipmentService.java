@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.EquipmentManager;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 
 @Path("/equipments")
 @Produces("application/json")
@@ -32,7 +33,14 @@ public class EquipmentService {
 
 		EquipmentManager.EquipmentFilter equipmentFilter =
 				new EquipmentManager.EquipmentFilter(name, equipmentTypeId, rented, accessionNumber, description);
-		return equipmentManager.getEquipments(equipmentFilter);
+		List<Equipment> equipments = equipmentManager.getEquipments(equipmentFilter);
+		for (Equipment equipment : equipments) {
+			if (equipment.getActualRental() != null) {
+				Rental rental = equipment.getActualRental();
+				rental.setEquipment(null);
+			}
+		}
+		return equipments;
 	}
 
 	@POST
