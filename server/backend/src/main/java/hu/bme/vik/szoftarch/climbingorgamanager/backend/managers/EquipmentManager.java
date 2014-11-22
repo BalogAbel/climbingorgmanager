@@ -1,6 +1,11 @@
 package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
-import java.util.List;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentTypeException;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.EquipmentType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -10,11 +15,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchEquipmentException;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.util.List;
 
 @Local
 @Stateless
@@ -22,16 +23,6 @@ public class EquipmentManager {
 
 	@PersistenceContext(unitName = "primary")
 	private EntityManager entityManager;
-
-	@Data
-	@AllArgsConstructor
-	public static class EquipmentFilter {
-		private String name;
-		private Long equipmentTypeId;
-		private Boolean rented;
-		private String accessionNumber;
-		private String description;
-	}
 
 	public List<Equipment> getEquipments(EquipmentFilter filter) {
 		if (filter == null) {
@@ -84,11 +75,37 @@ public class EquipmentManager {
 	}
 
 	public void addEquipment(Equipment equipment) {
+		entityManager.persist(equipment);
+	}
+
+	public void editEquipment(Equipment equipment) {
 		entityManager.merge(equipment);
 	}
 
 	public void removeEquipment(Equipment equipment) {
 		Equipment attachedEquipment = entityManager.merge(equipment);
 		entityManager.remove(attachedEquipment);
+	}
+
+	public List<EquipmentType> getEquipmentTypes() {
+		return entityManager.createNamedQuery(EquipmentType.GET_ALL, EquipmentType.class).getResultList();
+	}
+
+	public EquipmentType getEquipmentTypeById(long id) throws NoSuchEquipmentTypeException {
+		TypedQuery<EquipmentType> query = entityManager.createNamedQuery(EquipmentType.GET_BY_ID, EquipmentType.class);
+		query.setParameter("id", id);
+		List<EquipmentType> resultList = query.getResultList();
+		if (resultList.size() != 1) throw new NoSuchEquipmentTypeException();
+		return resultList.get(0);
+	}
+
+	@Data
+	@AllArgsConstructor
+	public static class EquipmentFilter {
+		private String name;
+		private Long equipmentTypeId;
+		private Boolean rented;
+		private String accessionNumber;
+		private String description;
 	}
 }

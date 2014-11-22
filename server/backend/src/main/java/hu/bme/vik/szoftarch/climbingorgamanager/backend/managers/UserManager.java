@@ -16,6 +16,7 @@ import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Date;
 import java.util.List;
 
 @Local
@@ -56,6 +57,8 @@ public class UserManager implements Serializable {
 		}
 
 		User user = users.get(0);
+		user.setLastLoginOn(new Date());
+		entityManager.persist(user);
 
 		BasicPasswordEncryptor passwordEncryptor = new BasicPasswordEncryptor();
 		if (!passwordEncryptor.checkPassword(password, user.getPassword())) {
@@ -81,7 +84,7 @@ public class UserManager implements Serializable {
 		BasicPasswordEncryptor encryptor = new BasicPasswordEncryptor();
 		String encryptedPassword = encryptor.encryptPassword(user.getPassword());
 		user.setPassword(encryptedPassword);
-		entityManager.merge(user);
+		entityManager.persist(user);
 	}
 
 	public User getUserById(long id) throws NoSuchUserException {
