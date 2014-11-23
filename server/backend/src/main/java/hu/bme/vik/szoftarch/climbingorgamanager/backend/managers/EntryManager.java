@@ -1,18 +1,18 @@
 package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.ejb.Local;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoMoreTimesOnPassException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.PassExpiredException;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Entry;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
+
+import javax.ejb.Local;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.Date;
+import java.util.List;
 
 @Local
 @Stateless
@@ -59,5 +59,18 @@ public class EntryManager {
 		entry.setEnteredOn(now);
 		entry.setPass(pass);
 		entry.setUser(user);
+		entityManager.persist(entry);
+	}
+
+	public List<Pass> getPasses(User user) {
+		TypedQuery<Pass> query = entityManager.createNamedQuery(Pass.GET_BY_USER, Pass.class);
+		query.setParameter("owner", user);
+		return query.getResultList();
+	}
+
+	public List<Entry> getEntries(User user) {
+		TypedQuery<Entry> query = entityManager.createNamedQuery(Entry.GET_BY_USER, Entry.class);
+		query.setParameter("user", user);
+		return query.getResultList();
 	}
 }
