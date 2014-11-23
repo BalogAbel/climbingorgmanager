@@ -99,6 +99,14 @@ public class EquipmentManager {
 		return resultList.get(0);
 	}
 
+	public void addEquipmentType(EquipmentType equipmentType) {
+		entityManager.persist(equipmentType);
+	}
+
+	public void editEquipmentType(EquipmentType equipmentType) {
+		entityManager.merge(equipmentType);
+	}
+
 	@Data
 	@AllArgsConstructor
 	public static class EquipmentFilter {
