@@ -31,6 +31,10 @@ import lombok.EqualsAndHashCode;
 		@NamedQuery(
 				name = Rental.GET_BY_USER,
 				query = "select r from Rental r where r.user = :user"
+		),
+		@NamedQuery(
+				name = Rental.GET_ACTIVE_BY_USER,
+				query = "select r from Rental r where r.user = :user and r.returnedOn is null"
 		)
 })
 public class Rental implements Serializable {
@@ -38,6 +42,7 @@ public class Rental implements Serializable {
 	public static final String GET_ALL = "Rental.getAll";
 	public static final String GET_BY_ID = "Rental.byId";
 	public static final String GET_BY_USER = "Rental.byUser";
+	public static final String GET_ACTIVE_BY_USER = "Rental.activeByUser";
 
 	@Id
 	@GeneratedValue

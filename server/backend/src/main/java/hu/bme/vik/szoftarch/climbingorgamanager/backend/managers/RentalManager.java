@@ -83,4 +83,11 @@ public class RentalManager {
 		query.setParameter("user", managedUser);
 		return query.getResultList();
 	}
+
+	public List<Rental> getActiveRentalsForUser(User user) {
+		User managedUser = entityManager.merge(user);
+		TypedQuery<Rental> query = entityManager.createNamedQuery(Rental.GET_ACTIVE_BY_USER, Rental.class);
+		query.setParameter("user", managedUser);
+		return query.getResultList();
+	}
 }
