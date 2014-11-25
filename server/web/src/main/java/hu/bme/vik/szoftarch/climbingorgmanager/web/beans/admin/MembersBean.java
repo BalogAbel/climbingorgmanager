@@ -1,5 +1,6 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.web.beans.admin;
 
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.EntryManager;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.RentalManager;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +38,10 @@ public class MembersBean implements Serializable {
 	@Inject
 	private RentalManager rentalManager;
 
+	@Inject
+	private EntryManager entryManager;
+
+
 	@PostConstruct
 	public void init() {
 		members = userManager.getUsers();
@@ -49,6 +56,11 @@ public class MembersBean implements Serializable {
 	public void remove() {
 		userManager.removeUser(selectedMember);
 		init();
+	}
+
+	public void enterGuest() {
+		entryManager.guestEntry();
+		FacesContext.getCurrentInstance().addMessage("guestEntry", new FacesMessage("Successful", "Guest entry was successful"));
 	}
 
 }

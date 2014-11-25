@@ -28,17 +28,11 @@ public class EntryManager {
 	public void enterWithTicket(User user) {
 		User managedUser = entityManager.merge(user);
 
-		Pass pass = new Pass();
 		Date now = new Date();
-		pass.setBoughtOn(now);
-		pass.setOwner(managedUser);
-		pass.setTimeLeft(0);
-		pass.setValidUntil(now);
-		Pass managedPass = entityManager.merge(pass);
 
 		Entry entry = new Entry();
 		entry.setEnteredOn(now);
-		entry.setPass(managedPass);
+		entry.setPass(null);
 		entry.setUser(managedUser);
 
 		entityManager.merge(entry);
@@ -60,6 +54,17 @@ public class EntryManager {
 		entry.setPass(pass);
 		entry.setUser(user);
 		entityManager.persist(entry);
+	}
+
+	public void guestEntry() {
+		Date now = new Date();
+
+		Entry entry = new Entry();
+		entry.setEnteredOn(now);
+		entry.setPass(null);
+		entry.setUser(null);
+
+		entityManager.merge(entry);
 	}
 
 	public List<Pass> getPasses(User user) {

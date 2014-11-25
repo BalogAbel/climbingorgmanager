@@ -34,8 +34,15 @@
 				</p:contextMenu>
 
 				<h2>Members</h2>
+				<p:growl for="guestEntry" showDetail="true" id="growl"/>
 
-				<h:outputLink value="editMember.xhtml">Create member</h:outputLink>
+				<p>
+					<p:commandLink action="#{membersBean.enterGuest}" value="Enter guest" update="growl"/>
+				</p>
+
+				<p>
+					<h:outputLink value="editMember.xhtml">Create member</h:outputLink>
+				</p>
 
 				<p:dataTable id="members" widgetVar="membersTable" var="member" value="#{membersBean.members}"
 							 filteredValue="#{membersBean.filteredMembers}"

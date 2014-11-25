@@ -4,6 +4,8 @@ import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCrede
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 import org.jasypt.util.password.BasicPasswordEncryptor;
@@ -111,13 +113,23 @@ public class UserManager implements Serializable {
 		User attachedUser = entityManager.merge(user);
 
 
-		Query query = entityManager.createQuery("update Entry set user = null, pass = null where user = :user");
+		Query query = entityManager.createQuery("update Entry set user = null where user = :user");
 		query.setParameter("user", user);
 		query.executeUpdate();
 
-		query = entityManager.createQuery("delete from Pass p where p.owner = :owner");
+		query = entityManager.createQuery("update Pass set owner = null where owner = :owner");
 		query.setParameter("owner", user);
 		query.executeUpdate();
+
+		TypedQuery<Rental> rentalQuery = entityManager.createNamedQuery(Rental.GET_BY_USER, Rental.class);
+		rentalQuery.setParameter("user", user);
+		List<Rental> rentals = rentalQuery.getResultList();
+		for (Rental rental : rentals) {
+			Equipment equipment = rental.getEquipment();
+			equipment.setActualRental(null);
+			entityManager.merge(equipment);
+		}
+		entityManager.flush();
 
 		query = entityManager.createQuery("delete from Rental r where r.user = :user");
 		query.setParameter("user", user);
@@ -126,6 +138,7 @@ public class UserManager implements Serializable {
 		query = entityManager.createQuery("update Entry set user = null where user = :user");
 		query.setParameter("user", user);
 		query.executeUpdate();
+
 
 		entityManager.remove(attachedUser);
 	}
