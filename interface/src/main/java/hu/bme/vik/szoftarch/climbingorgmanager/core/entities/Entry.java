@@ -38,10 +38,8 @@ public class Entry implements Serializable {
 	private Date enteredOn;
 
 	@ManyToOne
-	@NotNull
 	private Pass pass;
 
 	@ManyToOne
-	@NotNull
 	private User user;
 }

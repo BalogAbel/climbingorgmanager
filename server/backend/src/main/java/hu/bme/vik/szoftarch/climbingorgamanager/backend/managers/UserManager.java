@@ -12,6 +12,7 @@ import javax.ejb.Local;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -108,6 +109,19 @@ public class UserManager implements Serializable {
 
 	public void removeUser(User user) {
 		User attachedUser = entityManager.merge(user);
+
+		Query query = entityManager.createQuery("delete from Pass p where p.owner = :owner");
+		query.setParameter("owner", user);
+		query.executeUpdate();
+
+		query = entityManager.createQuery("delete from Rental r where r.user = :user");
+		query.setParameter("user", user);
+		query.executeUpdate();
+
+		query = entityManager.createQuery("update Entry set user = null where user = :user");
+		query.setParameter("user", user);
+		query.executeUpdate();
+
 		entityManager.remove(attachedUser);
 	}
 
