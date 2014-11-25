@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+
+			<h2>
+				<h:panelGroup rendered="#{not empty memberBean.user.id or empty memberBean.user}">
+					Edit member's details
+				</h:panelGroup>
+				<h:panelGroup rendered="#{empty memberBean.user.id and not empty memberBean.user}">
+					Create new member
+				</h:panelGroup>
+			</h2>
+			<h:outputText rendered="#{empty memberBean.user}" value="No such member"/>
+			<h:panelGroup rendered="#{not empty memberBean.user}">
+				<h:form id="editMember" styleClass="siteForm">
+					<h:panelGroup rendered="#{not empty memberBean.user.id}">
+						<div class="dataRow">
+							<span class="title">Username: </span>
+							<h:outputText value="#{memberBean.user.userName}" styleClass="data"/>
+						</div>
+						<div class="dataRow">
+							<span class="title">Email: </span>
+							<h:outputText value="#{memberBean.user.email}" styleClass="data"/>
+						</div>
+					</h:panelGroup>
+					<h:panelGroup rendered="#{empty memberBean.user.id}">
+						<div class="formRow">
+							<h:outputLabel value="Username:" for="username"/>
+							<h:inputText value="#{memberBean.user.userName}" id="username"/>
+							<h:message for="username" styleClass="error"/>
+						</div>
+						<div class="formRow">
+							<h:outputLabel value="Email:" for="email"/>
+							<h:inputText value="#{memberBean.user.email}" id="email"
+										 validatorMessage="email format is not valid">
+								<f:validateRegex
+										pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$"/>
+							</h:inputText>
+							<h:message for="email" styleClass="error"/>
+						</div>
+
+						<div class="formRow">
+							<h:outputLabel value="Password:" for="password"/>
+							<h:inputSecret value="#{memberBean.user.password}" id="password">
+								<f:validator validatorId="passwordValidator"/>
+								<f:attribute name="password2" value="#{password2}"/>
+							</h:inputSecret>
+							<h:message for="password" styleClass="error"/>
+						</div>
+						<div class="formRow">
+							<h:outputLabel value="Password confirmation:" for="password2"/>
+							<h:inputSecret binding="#{password2}" id="password2"/>
+							<h:message for="password2" styleClass="error"/>
+						</div>
+					</h:panelGroup>
+
+					<div class="formRow">
+						<h:outputLabel value="First name:" for="firstName"/>
+						<h:inputText value="#{memberBean.user.userData.firstName}" id="firstName"/>
+						<h:message for="firstName" styleClass="error"/>
+					</div>
+					<div class="formRow">
+						<h:outputLabel value="Last name:" for="lastName"/>
+						<h:inputText value="#{memberBean.user.userData.lastName}" id="lastName"/>
+						<h:message for="lastName" styleClass="error"/>
+					</div>
+					<div class="formRow">
+						<h:outputLabel value="Address:" for="address"/>
+						<h:inputText value="#{memberBean.user.userData.address}" id="address"/>
+						<h:message for="address" styleClass="error"/>
+					</div>
+					<h:commandButton action="#{memberBean.save}" value="Save member"
+									 rendered="#{not empty memberBean.user.id}">
+						<f:param name="id" value="#{memberBean.user.id}"/>
+					</h:commandButton>
+					<h:commandButton action="#{memberBean.create}" value="Create member"
+									 rendered="#{empty memberBean.user.id}"/>
+				</h:form>
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+
+			<h:form id="form">
+
+				<h:outputText value="#{enterBean.message}"/>
+
+				<p:contextMenu beforeShow="" for="passes" event="click" widgetVar="passesContextMenuW"
+							   id="passesContextMenu">
+					<p:menuitem value="Use this pass" action="#{enterBean.usePass}" update="passes,message"/>
+				</p:contextMenu>
+
+				<h2>
+					Member passes -
+					<h:outputText value="#{enterBean.user.userName}"/>
+				</h2>
+
+				<h:outputText id="message" value="#{enterBean.message}"/>
+				<p:dataTable id="passes" widgetVar="passesTable" var="pass"
+							 value="#{enterBean.passes}"
+							 resizableColumns="true" liveResize="true"
+							 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+							 selectionMode="single" selection="#{enterBean.selectedPass}"
+							 rowKey="#{pass.id}">
+					<p:ajax event="rowSelect" update=":form:passesContextMenu"
+							oncomplete="PF('passesContextMenuW').show();"/>
+
+					<p:column headerText="Time left">
+						<h:outputText value="#{pass.timeLeft}"/>
+					</p:column>
+
+					<p:column headerText="Valid until">
+						<h:outputText value="#{pass.validUntil}">
+							<f:convertDateTime pattern="yyyy. MM. dd. HH:mm"/>
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Bought on">
+						<h:outputText value="#{pass.validUntil}">
+							<f:convertDateTime pattern="yyyy. MM. dd. HH:mm"/>
+						</h:outputText>
+					</p:column>
+
+				</p:dataTable>
+
+
+				<h3>
+					Member entries
+				</h3>
+
+				<p:dataTable id="entries" widgetVar="entriesTable" var="entry"
+							 value="#{enterBean.entries}"
+							 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+							 resizableColumns="true" liveResize="true">
+
+					<p:column headerText="Time left">
+						<h:outputText value="#{entry.enteredOn}"/>
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

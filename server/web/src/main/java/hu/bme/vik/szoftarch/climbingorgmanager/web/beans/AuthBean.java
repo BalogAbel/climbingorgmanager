@@ -1,7 +1,11 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.web.beans;
 
-import java.io.IOException;
-import java.io.Serializable;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
+import lombok.Getter;
+import lombok.Setter;
+import org.jasypt.util.password.BasicPasswordEncryptor;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -10,12 +14,8 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
-import lombok.Getter;
-import lombok.Setter;
+import java.io.IOException;
+import java.io.Serializable;
 
 @ManagedBean
 @SessionScoped
@@ -28,9 +28,14 @@ public class AuthBean implements Serializable {
 	@Getter
 	@Setter
 	private String username;
+
 	@Getter
 	@Setter
 	private String password;
+
+	@Getter
+	@Setter
+	private String newPassword;
 
 	@Inject
 	private UserManager userManager;
@@ -55,6 +60,28 @@ public class AuthBean implements Serializable {
 		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
 		ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
 		ec.redirect(((HttpServletRequest) ec.getRequest()).getRequestURI());
+	}
+
+
+	public String save() {
+		userManager.editUser(user);
+		return "editProfileSuccess.xhtml";
+	}
+
+	public String changePassword() {
+		try {
+			user = userManager.login(user.getUserName(), password);
+			BasicPasswordEncryptor encryptor = new BasicPasswordEncryptor();
+			user.setPassword(encryptor.encryptPassword(newPassword));
+			userManager.editUser(user);
+			newPassword = "";
+			password = "";
+		} catch (BadLoginCredentialsException e) {
+			FacesMessage facesMessage = new FacesMessage("the given password is not correct");
+			FacesContext.getCurrentInstance().addMessage("changePassword:currentPassword", facesMessage);
+			return "";
+		}
+		return "editProfileSuccess.xhtml";
 	}
 
 }

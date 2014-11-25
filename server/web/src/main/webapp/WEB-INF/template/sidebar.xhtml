@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html">
 <body>
 
 <ui:composition>
-    <nav>
-        <a href="#">Link1</a>
-        <a href="#">Link2</a>
-        <a href="#">Link3</a>
-    </nav>
+	<nav>
+		<h:panelGroup rendered="#{authBean.user.admin}">
+			<h:outputLink value="#{request.contextPath}/app/admin/members.xhtml">Members</h:outputLink>
+		</h:panelGroup>
+		<h:panelGroup rendered="#{authBean.user.admin}">
+			<h:outputLink value="#{request.contextPath}/app/admin/equipments.xhtml">Equipments</h:outputLink>
+		</h:panelGroup>
+		<h:panelGroup rendered="#{authBean.user.admin}">
+			<h:outputLink value="#{request.contextPath}/app/admin/statistics.xhtml">Statistics</h:outputLink>
+		</h:panelGroup>
+		<h:outputLink value="#{request.contextPath}/app/myStatistics.xhtml">My statistics</h:outputLink>
+		<h:outputLink value="#{request.contextPath}/app/myRentals.xhtml">My rentals</h:outputLink>
+	</nav>
+
 
 </ui:composition>
 

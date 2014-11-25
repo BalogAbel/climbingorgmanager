@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+			<h2>Equipment's details</h2>
+			<h:outputText rendered="#{empty equipmentBean.equipment}" value="No such equipment"/>
+			<h:panelGroup rendered="#{not empty equipmentBean.equipment}">
+				<div class="dataRow">
+					<span class="title">Name: </span>
+					<h:outputText value="#{equipmentBean.equipment.name}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Accession number: </span>
+					<h:outputText value="#{equipmentBean.equipment.accessionNumber}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Description: </span>
+					<h:outputText value="#{equipmentBean.equipment.description}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Type name: </span>
+					<h:outputText value="#{equipmentBean.equipment.equipmentType.name}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Type description: </span>
+					<h:outputText value="#{equipmentBean.equipment.equipmentType.description}" styleClass="data"/>
+				</div>
+				<h:outputLink value="editEquipment.xhtml">Edit equipment
+					<f:param name="id" value="#{equipmentBean.equipment.id}"/>
+				</h:outputLink>
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

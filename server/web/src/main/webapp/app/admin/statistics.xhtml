@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui"
+	  xmlns:util="http://climbingorgamanager/util">
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+			<h2>Statistics</h2>
+
+			<h3>Entries</h3>
+
+			<h4>Daily</h4>
+			<p:chart type="line" model="#{adminStatisticsBean.dailyEntriesModel}"/>
+
+			<h4>Weekly (last 12)</h4>
+			<ul>
+				<ui:repeat value="#{util:mapToList(adminStatisticsBean.weeklyEntries)}" var="item"
+						   size="#{size > 12 ? 12: size}">
+					<li><h:outputText value="#{item.key}: #{item.value}"/></li>
+				</ui:repeat>
+			</ul>
+
+			<h4>Monthly (last 12)</h4>
+			<ul>
+				<ui:repeat value="#{util:mapToList(adminStatisticsBean.monthlyEntries)}" var="item"
+						   size="#{size > 12 ? 12: size}">
+					<li><h:outputText value="#{item.key}: #{item.value}"/></li>
+				</ui:repeat>
+			</ul>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

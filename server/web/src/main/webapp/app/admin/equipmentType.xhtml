@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+			<h2>Equipment's details</h2>
+			<h:outputText rendered="#{empty equipmentTypeBean.equipmentType}" value="No such equipment"/>
+			<h:panelGroup rendered="#{not empty equipmentTypeBean.equipmentType}">
+				<div class="dataRow">
+					<span class="title">Name: </span>
+					<h:outputText value="#{equipmentTypeBean.equipmentType.name}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Description: </span>
+					<h:outputText value="#{equipmentTypeBean.equipmentType.description}" styleClass="data"/>
+				</div>
+				<h:outputLink value="editEquipmentType.xhtml">Edit equipment type
+					<f:param name="id" value="#{equipmentTypeBean.equipmentType.id}"/>
+				</h:outputLink>
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+
+			<h:form id="form">
+
+				<p:contextMenu beforeShow="" for="equipments" event="click" widgetVar="equipmentContextMenuW"
+							   id="equipmentContextMenu">
+					<p:menuitem value="View equipment" outcome="equipment.xhtml">
+						<f:param name="id" value="#{equipmentsBean.selectedEquipment.id}"/>
+					</p:menuitem>
+				</p:contextMenu>
+
+				<h2>Equipments</h2>
+
+				<div>
+					<h:outputLink value="editEquipment.xhtml">Create equipment</h:outputLink><br/>
+					<h:outputLink value="equipmentTypes.xhtml">Manage equipment types</h:outputLink>
+				</div>
+				<p:dataTable id="equipments" widgetVar="equipmentsTable" var="equipment"
+							 value="#{equipmentsBean.equipments}"
+							 filteredValue="#{equipmentsBean.filteredEquipments}"
+							 resizableColumns="true" liveResize="true"
+							 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+							 selectionMode="single" selection="#{equipmentsBean.selectedEquipment}"
+							 rowKey="#{equipment.id}"
+							 styleClass="fixedSize">
+					<p:ajax event="rowSelect" update=":form:equipmentContextMenu :form:equipments"
+							oncomplete="PF('equipmentContextMenuW').show();"/>
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputLabel value="Search: " for="globalFilter"/>
+							<p:inputText id="globalFilter" onkeyup="PF('equipmentsTable').filter()" style="width:150px"
+										 placeholder="Enter keyword"/>
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column headerText="Name" filterBy="#{equipment.name}" filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{equipment.name}"/>
+					</p:column>
+					<p:column headerText="Description" filterBy="#{equipment.description}" filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{equipment.description}"/>
+					</p:column>
+					<p:column headerText="Accession number" filterBy="#{equipment.accessionNumber}"
+							  filterMatchMode="contains" filterStyle="display:none">
+						<h:outputText value="#{equipment.accessionNumber}"/>
+					</p:column>
+					<p:column headerText="Type" filterBy="#{equipment.equipmentType.name}"
+							  filterMatchMode="contains" filterStyle="display:none">
+						<h:outputText value="#{equipment.equipmentType.name}"/>
+					</p:column>
+					<p:column headerText="Available">
+						<p:graphicImage value="/resources/images/tick.jpg"
+										rendered="#{empty equipment.actualRental}"
+										height="10px"/>
+						<p:graphicImage value="/resources/images/cross.jpg"
+										rendered="#{not empty equipment.actualRental}" height="10px"/>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+			<h2>
+				<h:panelGroup
+						rendered="#{not empty equipmentTypeBean.equipmentType.id or empty equipmentTypeBean.equipmentType}">
+					Edit equipments type's details
+				</h:panelGroup>
+				<h:panelGroup
+						rendered="#{empty equipmentTypeBean.equipmentType.id and not empty equipmentTypeBean.equipmentType}">
+					Create new equipment type
+				</h:panelGroup>
+			</h2>
+			<h:outputText rendered="#{empty equipmentTypeBean.equipmentType}" value="No such equipment"/>
+			<h:panelGroup rendered="#{not empty equipmentTypeBean.equipmentType}">
+				<h:form styleClass="siteForm">
+					<div class="formRow">
+						<h:outputLabel value="Name:" for="name"/>
+						<h:inputText value="#{equipmentTypeBean.equipmentType.name}" id="name"/>
+						<h:message for="name" styleClass="error"/>
+					</div>
+					<div class="formRow">
+						<h:outputLabel value="Description:" for="description"/>
+						<h:inputText value="#{equipmentTypeBean.equipmentType.description}" id="description"/>
+						<h:message for="description" styleClass="error"/>
+					</div>
+
+					<h:commandButton action="#{equipmentTypeBean.save}" value="Save equipment type"
+									 rendered="#{not empty equipmentTypeBean.equipmentType.id}">
+						<f:param name="id" value="#{equipmentTypeBean.equipmentType.id}"/>
+					</h:commandButton>
+					<h:commandButton action="#{equipmentTypeBean.create}" value="Create equipment type"
+									 rendered="#{empty equipmentTypeBean.equipmentType.id}"/>
+				</h:form>
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

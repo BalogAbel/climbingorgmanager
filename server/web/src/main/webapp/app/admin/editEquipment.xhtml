@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+			<h2>
+				<h:panelGroup rendered="#{not empty equipmentBean.equipment.id or empty equipmentBean.equipment}">
+					Edit equipments's details
+				</h:panelGroup>
+				<h:panelGroup rendered="#{empty equipmentBean.equipment.id and not empty equipmentBean.equipment}">
+					Create new equipment
+				</h:panelGroup>
+			</h2>
+			<h:outputText rendered="#{empty equipmentBean.equipment}" value="No such equipment"/>
+			<h:panelGroup rendered="#{not empty equipmentBean.equipment}">
+				<h:form styleClass="siteForm">
+					<div class="formRow">
+						<h:outputLabel value="Name:" for="name"/>
+						<h:inputText value="#{equipmentBean.equipment.name}" id="name"/>
+						<h:message for="name" styleClass="error"/>
+					</div>
+					<div class="formRow">
+						<h:outputLabel value="Accession number:" for="accessionNumber"/>
+						<h:inputText value="#{equipmentBean.equipment.accessionNumber}" id="accessionNumber"/>
+						<h:message for="accessionNumber" styleClass="error"/>
+					</div>
+					<div class="formRow">
+						<h:outputLabel value="Description:" for="description"/>
+						<h:inputText value="#{equipmentBean.equipment.description}" id="description"/>
+						<h:message for="description" styleClass="error"/>
+					</div>
+					<div class="formRow">
+						<h:outputLabel value="Type:" for="type"/>
+						<h:selectOneMenu value="#{equipmentBean.equipment.equipmentType}" id="type"
+										 converter="#{equipmentTypeConverter}" converterMessage="select a value"
+										 requiredMessage="select a value">
+							<f:selectItem itemValue="#{null}" itemLabel="Select type"/>
+							<f:selectItems value="#{equipmentBean.equipmentTypes}" var="et"
+										   itemLabel="#{et.name}" itemValue="#{et}"/>
+						</h:selectOneMenu>
+						<h:message for="type" styleClass="error"/>
+					</div>
+
+					<h:commandButton action="#{equipmentBean.save}" value="Save equipment"
+									 rendered="#{not empty equipmentBean.equipment.id}">
+						<f:param name="id" value="#{equipmentBean.equipment.id}"/>
+					</h:commandButton>
+					<h:commandButton action="#{equipmentBean.create}" value="Create equipment"
+									 rendered="#{empty equipmentBean.equipment.id}"/>
+				</h:form>
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

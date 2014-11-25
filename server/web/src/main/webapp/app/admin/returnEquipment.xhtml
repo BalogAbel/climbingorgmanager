@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+	  xmlns:p="http://primefaces.org/ui"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+			<h2>
+				Rentals -
+				<h:outputText value="#{returnEquipmentBean.user.userName}"/>
+			</h2>
+			<h:outputText rendered="#{empty returnEquipmentBean.user or empty returnEquipmentBean.user.id}"
+						  value="No such user"/>
+			<h:panelGroup rendered="#{not empty returnEquipmentBean.user and not empty returnEquipmentBean.user.id}">
+				<h:form>
+					<p:dataTable id="rentals" widgetVar="rentalsTable" var="rental"
+								 value="#{returnEquipmentBean.rentals}"
+								 filteredValue="#{returnEquipmentBean.filteredRentals}"
+								 resizableColumns="true" liveResize="true"
+								 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+								 selection="#{returnEquipmentBean.selectedRentals}"
+								 rowKey="#{rental.id}"
+								 styleClass="fixedSize">
+						<f:facet name="header">
+							<p:outputPanel>
+								<h:outputLabel value="Search: " for="globalFilter"/>
+								<p:inputText id="globalFilter" onkeyup="PF('rentalsTable').filter()" style="width:150px"
+											 placeholder="Enter keyword"/>
+							</p:outputPanel>
+						</f:facet>
+
+
+						<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+
+						<p:column headerText="Name" filterBy="#{rental.equipment.name}" filterMatchMode="contains"
+								  filterStyle="display:none">
+							<h:outputText value="#{rental.equipment.name}"/>
+						</p:column>
+						<p:column headerText="Accession number" filterBy="#{rental.equipment.accessionNumber}"
+								  filterMatchMode="contains" filterStyle="display:none">
+							<h:outputText value="#{rental.equipment.accessionNumber}"/>
+						</p:column>
+						<p:column headerText="Type" filterBy="#{rental.equipment.equipmentType.name}"
+								  filterMatchMode="contains" filterStyle="display:none">
+							<h:outputText value="#{rental.equipment.equipmentType.name}"/>
+						</p:column>
+						<p:column headerText="Rented on">
+							<h:outputText value="#{rental.rentedOn}">
+								<f:convertDateTime pattern="yyyy. MM. dd."/>
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Rented until">
+							<h:outputText value="#{rental.rentedUntil}">
+								<f:convertDateTime pattern="yyyy. MM. dd."/>
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+
+					<p>
+						<p:commandButton value="Return rental" action="#{returnEquipmentBean.returnEquipments}"
+										 ajax="true" update="rentals"/>
+					</p>
+
+					<h3>Already returned items</h3>
+
+					<p:dataTable id="returnedRentals" widgetVar="returnedRentalsTable" var="rental"
+								 value="#{returnEquipmentBean.returnedRentals}"
+								 resizableColumns="true" liveResize="true"
+								 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+								 rowKey="#{rental.id}"
+								 styleClass="fixedSize">
+						<f:facet name="header">
+							<p:outputPanel>
+								<h:outputLabel value="Search: " for="globalFilter"/>
+								<p:inputText id="globalFilter" onkeyup="PF('returnedRentalsTable').filter()"
+											 style="width:150px"
+											 placeholder="Enter keyword"/>
+							</p:outputPanel>
+						</f:facet>
+
+
+						<p:column headerText="Name" filterBy="#{rental.equipment.name}"
+								  filterMatchMode="contains" filterStyle="display:none">
+							<h:outputText value="#{rental.equipment.name}"/>
+						</p:column>
+						<p:column headerText="Accession number" filterBy="#{rental.equipment.accessionNumber}"
+								  filterMatchMode="contains" filterStyle="display:none">
+							<h:outputText value="#{rental.equipment.accessionNumber}"/>
+						</p:column>
+						<p:column headerText="Type" filterBy="#{rental.equipment.equipmentType.name}"
+								  filterMatchMode="contains" filterStyle="display:none">
+							<h:outputText value="#{rental.equipment.equipmentType.name}"/>
+						</p:column>
+						<p:column headerText="Rented on">
+							<h:outputText value="#{rental.rentedOn}">
+								<f:convertDateTime pattern="yyyy. MM. dd."/>
+							</h:outputText>
+						</p:column>
+						<p:column headerText="Returned on">
+							<h:outputText value="#{rental.returnedOn}">
+								<f:convertDateTime pattern="yyyy. MM. dd."/>
+							</h:outputText>
+						</p:column>
+					</p:dataTable>
+				</h:form>
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

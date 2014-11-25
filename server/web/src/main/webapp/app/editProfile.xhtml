@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+
+			<h2>
+				Edit profile
+			</h2>
+			<h:form styleClass="siteForm">
+				<div class="formRow">
+					<h:outputLabel value="First name:" for="firstName"/>
+					<h:inputText value="#{authBean.user.userData.firstName}" id="firstName"/>
+					<h:message for="firstName" styleClass="error"/>
+				</div>
+				<div class="formRow">
+					<h:outputLabel value="Last name:" for="lastName"/>
+					<h:inputText value="#{authBean.user.userData.lastName}" id="lastName"/>
+					<h:message for="lastName" styleClass="error"/>
+				</div>
+				<div class="formRow">
+					<h:outputLabel value="Address:" for="address"/>
+					<h:inputText value="#{authBean.user.userData.address}" id="address"/>
+					<h:message for="address" styleClass="error"/>
+				</div>
+				<h:commandButton action="#{authBean.save}" value="Save profile"/>
+				<h:outputLink value="changePassword.xhtml">Change password</h:outputLink>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

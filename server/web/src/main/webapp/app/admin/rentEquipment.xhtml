@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+	  xmlns:util="http://climbingorgamanager/util">
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+
+			<h:form id="form" styleClass="siteForm">
+
+				<h2>Rent equipments</h2>
+
+				<h3>Available equipments</h3>
+
+				<p:dataTable id="equipments" widgetVar="equipmentsTable" var="equipment"
+							 value="#{rentalBean.equipments}"
+							 filteredValue="#{rentalBean.filteredEquipments}"
+							 resizableColumns="true" liveResize="true"
+							 selection="#{rentalBean.selectedEquipments}"
+							 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+							 rowKey="#{equipment.id}"
+							 styleClass="fixedSize">
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputLabel value="Search: " for="globalFilter"/>
+							<p:inputText id="globalFilter" onkeyup="PF('equipmentsTable').filter()" style="width:150px"
+										 placeholder="Enter keyword"/>
+						</p:outputPanel>
+					</f:facet>
+
+					<p:ajax event="rowSelectCheckbox" update=":form:selectedEquipments" process="equipments"/>
+					<p:ajax event="rowUnselectCheckbox" update=":form:selectedEquipments" process="equipments"/>
+					<p:ajax event="toggleSelect" update=":form:selectedEquipments" process="equipments"/>
+
+					<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+
+					<p:column headerText="Name" filterBy="#{equipment.name}" filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{equipment.name}"/>
+					</p:column>
+					<p:column headerText="Description" filterBy="#{equipment.description}" filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{equipment.description}"/>
+					</p:column>
+					<p:column headerText="Accession number" filterBy="#{equipment.accessionNumber}"
+							  filterMatchMode="contains" filterStyle="display:none">
+						<h:outputText value="#{equipment.accessionNumber}"/>
+					</p:column>
+					<p:column headerText="Type" filterBy="#{equipment.equipmentType.name}"
+							  filterMatchMode="contains" filterStyle="display:none">
+						<h:outputText value="#{equipment.equipmentType.name}"/>
+					</p:column>
+					<p:column headerText="Available">
+						<p:graphicImage value="/resources/images/tick.jpg"
+										rendered="#{empty equipment.actualRental}"
+										height="10px"/>
+						<p:graphicImage value="/resources/images/cross.jpg"
+										rendered="#{not empty equipment.actualRental}" height="10px"/>
+					</p:column>
+
+				</p:dataTable>
+
+				<h3>Selected equipments</h3>
+
+				<p:dataTable id="selectedEquipments" widgetVar="selectedEquipmentsTable" var="selectedEquipment"
+							 value="#{rentalBean.selectedEquipments}"
+							 resizableColumns="true" liveResize="true"
+							 styleClass="fixedSize">
+
+					<p:column headerText="Name" filterBy="#{selectedEquipment.name}" filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{selectedEquipment.name}"/>
+					</p:column>
+					<p:column headerText="Description" filterBy="#{selectedEquipment.description}"
+							  filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{selectedEquipment.description}"/>
+					</p:column>
+					<p:column headerText="Accession number" filterBy="#{selectedEquipment.accessionNumber}"
+							  filterMatchMode="contains" filterStyle="display:none">
+						<h:outputText value="#{selectedEquipment.accessionNumber}"/>
+					</p:column>
+					<p:column headerText="Type" filterBy="#{selectedEquipment.equipmentType.name}"
+							  filterMatchMode="contains" filterStyle="display:none">
+						<h:outputText value="#{selectedEquipment.equipmentType.name}"/>
+					</p:column>
+				</p:dataTable>
+
+				<h3>Select date</h3>
+				<p:calendar pattern="yyyy. MM. dd."/>
+
+				<p>
+					<p:commandButton value="Send rental" action="#{rentalBean.rent}" ajax="true" update="rentalDialog"
+									 oncomplete="PF('rentalDialogW').show()"/>
+				</p>
+
+				<p:dialog modal="true" id="rentalDialog" widgetVar="rentalDialogW">
+					<h3>The following eguipments has successfully rented:</h3>
+					<ul>
+						<ui:repeat value="#{util:mapToList(rentalBean.result)}" var="result">
+							<h:panelGroup rendered="#{result.value eq 0}">
+								<li><h:outputText value="#{result.key.name}"/></li>
+							</h:panelGroup>
+						</ui:repeat>
+					</ul>
+					<h3>The following eguipments has not been rented, because they are not available</h3>
+					<ul>
+						<ui:repeat value="#{util:mapToList(rentalBean.result)}" var="result">
+							<h:panelGroup rendered="#{result.value eq 1}">
+								<li><h:outputText value="#{result.key.name}"/></li>
+							</h:panelGroup>
+						</ui:repeat>
+					</ul>
+					<h3>The following eguipments has not been rented, because member is not recognized:</h3>
+					<ul>
+						<ui:repeat value="#{util:mapToList(rentalBean.result)}" var="result">
+							<h:panelGroup rendered="#{result.value eq 2}">
+								<li><h:outputText value="#{result.key.name}"/></li>
+							</h:panelGroup>
+						</ui:repeat>
+					</ul>
+				</p:dialog>
+
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

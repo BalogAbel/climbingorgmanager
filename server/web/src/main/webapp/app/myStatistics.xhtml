@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	  xmlns:h="http://java.sun.com/jsf/html"
-	  xmlns:ui="http://java.sun.com/jsf/facelets">
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui">
 <h:body>
 
 	<ui:composition template="/WEB-INF/template/template.xhtml">
 
 		<ui:define name="content">
-			<h2>Welcome</h2>
-			This is a climbing organization manager app.
+
+			<h2>My statistics</h2>
+
+			<h3>Entries</h3>
+			<p:chart type="line" model="#{myStatisticsBean.entriesModel}"/>
 		</ui:define>
 	</ui:composition>
 

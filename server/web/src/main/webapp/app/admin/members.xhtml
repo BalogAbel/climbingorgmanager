@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets"
+	  xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+
+			<h:form id="form">
+
+				<p:contextMenu beforeShow="" for="members" event="click" widgetVar="memberContextMenuW"
+							   id="memberContextMenu">
+					<p:menuitem value="Enter" outcome="enterMember.xhtml">
+						<f:param name="id" value="#{membersBean.selectedMember.id}"/>
+					</p:menuitem>
+					<p:menuitem value="Rent equipment" rendered="#{membersBean.selectedMember.recognizedMember}"
+								outcome="rentEquipment.xhtml">
+						<f:param name="id" value="#{membersBean.selectedMember.id}"/>
+					</p:menuitem>
+					<p:menuitem value="Return equipment" rendered="#{membersBean.selectedMember.recognizedMember}"
+								outcome="returnEquipment.xhtml">
+						<f:param name="id" value="#{membersBean.selectedMember.id}"/>
+					</p:menuitem>
+					<p:menuitem value="View user" outcome="member.xhtml">
+						<f:param name="id" value="#{membersBean.selectedMember.id}"/>
+					</p:menuitem>
+					<p:menuitem value="Set as #{membersBean.selectedMember.admin ? 'normal' : 'admin'} member"
+								action="#{membersBean.changeAdminStatus}" ajax="true" update="members"/>
+					<p:menuitem value="Remove member"
+								action="#{membersBean.remove}" ajax="true" update="members"/>
+				</p:contextMenu>
+
+				<h2>Members</h2>
+
+				<h:outputLink value="editMember.xhtml">Create member</h:outputLink>
+
+				<p:dataTable id="members" widgetVar="membersTable" var="member" value="#{membersBean.members}"
+							 filteredValue="#{membersBean.filteredMembers}"
+							 resizableColumns="true" liveResize="true"
+							 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+							 selectionMode="single" selection="#{membersBean.selectedMember}" rowKey="#{member.id}">
+					<p:ajax event="rowSelect" update=":form:memberContextMenu :form:members"
+							oncomplete="PF('memberContextMenuW').show();"/>
+					<f:facet name="header">
+						<p:outputPanel>
+							<h:outputLabel value="Search: " for="globalFilter"/>
+							<p:inputText id="globalFilter" onkeyup="PF('membersTable').filter()" style="width:150px"
+										 placeholder="Enter keyword"/>
+						</p:outputPanel>
+					</f:facet>
+
+					<p:column headerText="Username" filterBy="#{member.userName}" filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{member.userName}"/>
+					</p:column>
+					<p:column headerText="Email" filterBy="#{member.email}" filterMatchMode="contains"
+							  filterStyle="display:none">
+						<h:outputText value="#{member.email}"/>
+					</p:column>
+					<p:column headerText="Name" filterBy="#{member.userData.firstName} #{member.userData.lastName}"
+							  filterMatchMode="contains" filterStyle="display:none">
+						<h:outputText value="#{member.userData.firstName} #{member.userData.lastName}"/>
+					</p:column>
+					<p:column headerText="Recognized member">
+						<p:graphicImage value="/resources/images/tick.jpg" rendered="#{member.recognizedMember}"
+										height="10px"/>
+						<p:graphicImage value="/resources/images/cross.jpg"
+										rendered="#{not member.recognizedMember}" height="10px"/>
+					</p:column>
+
+					<p:column headerText="Admin">
+						<p:graphicImage value="/resources/images/tick.jpg" rendered="#{member.admin}"
+										height="10px"/>
+						<p:graphicImage value="/resources/images/cross.jpg"
+										rendered="#{not member.admin}" height="10px"/>
+					</p:column>
+
+				</p:dataTable>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>

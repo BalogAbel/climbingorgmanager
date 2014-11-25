@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://java.sun.com/jsf/html"
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+		>
+
+<h:body>
+	<ui:composition template="/WEB-INF/template/template.xhtml">
+
+		<ui:define name="content">
+			<h2>Member's details</h2>
+			<h:outputText rendered="#{empty memberBean.user or empty memberBean.user.id}" value="No such user"/>
+			<h:panelGroup rendered="#{not empty memberBean.user and not empty memberBean.user.id}">
+				<div class="dataRow">
+					<span class="title">Username: </span>
+					<h:outputText value="#{memberBean.user.userName}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Email: </span>
+					<h:outputText value="#{memberBean.user.email}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">First name: </span>
+					<h:outputText value="#{memberBean.user.userData.firstName}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Last name: </span>
+					<h:outputText value="#{memberBean.user.userData.lastName}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Address: </span>
+					<h:outputText value="#{memberBean.user.userData.address}" styleClass="data"/>
+				</div>
+				<div class="dataRow">
+					<span class="title">Registered on: </span>
+					<h:outputText value="#{memberBean.user.registeredOn}" styleClass="data">
+						<f:convertDateTime pattern="yyyy. MM. dd. HH:mm"/>
+					</h:outputText>
+				</div>
+				<div class="dataRow">
+					<span class="title">Last login on: </span>
+					<h:outputText value="#{memberBean.user.lastLoginOn}" styleClass="data">
+						<f:convertDateTime pattern="yyyy. MM. dd. HH:mm"/>
+					</h:outputText>
+				</div>
+				<h:outputLink value="editMember.xhtml">Edit member
+					<f:param name="id" value="#{memberBean.user.id}"/>
+				</h:outputLink>
+			</h:panelGroup>
+		</ui:define>
+	</ui:composition>
+
+</h:body>
+
+</html>
