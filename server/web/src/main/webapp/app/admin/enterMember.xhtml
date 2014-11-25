@@ -9,7 +9,7 @@
 
 		<ui:define name="content">
 
-			<h:form id="form">
+			<h:form id="form" styleClass="siteForm">
 
 				<h:outputText value="#{enterBean.message}"/>
 
@@ -73,6 +73,20 @@
 						</h:outputText>
 					</p:column>
 				</p:dataTable>
+
+
+				<h3>New pass</h3>
+
+				<div class="formRow">
+					<h:outputLabel value="Valid until (month):" for="validMonths"/>
+					<p:inputText value="#{enterBean.validMonth}" min="0" id="validMonths"/>
+				</div>
+				<div class="formRow">
+					<h:outputLabel value="Times on pass:" for="timeLeft"/>
+					<p:inputText value="#{enterBean.timeLeft}" min="0" id="timeLeft"/>
+				</div>
+				<p:commandButton action="#{enterBean.addPass}" update="entryGrowl,validMonths,timeLeft,passes"
+								 ajax="true" value="Add pass"/>
 			</h:form>
 		</ui:define>
 	</ui:composition>

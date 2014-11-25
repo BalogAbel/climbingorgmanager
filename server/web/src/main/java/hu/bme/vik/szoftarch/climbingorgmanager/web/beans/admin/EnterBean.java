@@ -4,6 +4,7 @@ import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoMoreTimesOn
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.PassExpiredException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.EntryManager;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.PassManager;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Entry;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass;
@@ -31,6 +32,8 @@ public class EnterBean implements Serializable {
 	private EntryManager entryManager;
 	@Inject
 	private UserManager userManager;
+	@Inject
+	private PassManager passManager;
 
 	@Getter
 	private User user;
@@ -44,6 +47,14 @@ public class EnterBean implements Serializable {
 
 	@Getter
 	private List<Entry> entries;
+
+	@Getter
+	@Setter
+	private int validMonth;
+
+	@Getter
+	@Setter
+	private int timeLeft;
 
 	@Getter
 	private String message;
@@ -107,5 +118,13 @@ public class EnterBean implements Serializable {
 		entryManager.enterWithTicket(user);
 		updatePasses();
 		FacesContext.getCurrentInstance().addMessage("entry", new FacesMessage("Successful", "Entry with ticket was successful"));
+	}
+
+	public void addPass() {
+		passManager.buyPass(user, timeLeft, validMonth);
+		timeLeft = 0;
+		validMonth = 0;
+		FacesContext.getCurrentInstance().addMessage("entry", new FacesMessage("Successful", "Entry with ticket was successful"));
+
 	}
 }
