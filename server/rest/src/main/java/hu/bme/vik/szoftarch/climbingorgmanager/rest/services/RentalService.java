@@ -98,4 +98,20 @@ public class RentalService {
 			return Response.status(Response.Status.BAD_REQUEST).entity("No user found for id.").build();
 		}
 	}
+
+	@GET
+	@Path("active/{userId}")
+	public Response getActiveRentals(@PathParam("userId") long userId) {
+		try {
+			User user = userManager.getUserById(userId);
+			List<Rental> rentals = rentalManager.getActiveRentalsForUser(user);
+			for (Rental rental : rentals) {
+				Equipment equipment = rental.getEquipment();
+				equipment.setActualRental(null);
+			}
+			return Response.status(Response.Status.OK).entity(rentals).build();
+		} catch (NoSuchUserException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("No user found for id.").build();
+		}
+	}
 }

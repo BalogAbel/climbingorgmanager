@@ -6,6 +6,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,6 +45,12 @@ public final class GsonMessageBodyHandler implements MessageBodyWriter<Object>,
 				public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws
 						JsonParseException {
 					return new Date(json.getAsJsonPrimitive().getAsLong());
+				}
+			});
+			gsonBuilder.registerTypeAdapter(Date.class, new JsonSerializer<Date>() {
+				@Override
+				public JsonElement serialize(Date date, Type type, JsonSerializationContext jsonSerializationContext) {
+					return date == null ? null : new JsonPrimitive(date.getTime());
 				}
 			});
 			gson = gsonBuilder.create();
