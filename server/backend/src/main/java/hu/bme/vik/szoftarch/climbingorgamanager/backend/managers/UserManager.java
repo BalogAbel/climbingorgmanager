@@ -110,7 +110,12 @@ public class UserManager implements Serializable {
 	public void removeUser(User user) {
 		User attachedUser = entityManager.merge(user);
 
-		Query query = entityManager.createQuery("delete from Pass p where p.owner = :owner");
+
+		Query query = entityManager.createQuery("update Entry set user = null, pass = null where user = :user");
+		query.setParameter("user", user);
+		query.executeUpdate();
+
+		query = entityManager.createQuery("delete from Pass p where p.owner = :owner");
 		query.setParameter("owner", user);
 		query.executeUpdate();
 
