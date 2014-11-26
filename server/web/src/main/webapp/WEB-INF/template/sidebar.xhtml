@@ -5,17 +5,20 @@
 
 <ui:composition>
 	<nav>
+		<h:outputLink value="#{request.contextPath}/app/myRentals.xhtml">My rentals</h:outputLink>
+		<h:outputLink value="#{request.contextPath}/app/myStatistics.xhtml">My statistics</h:outputLink>
+		<h:panelGroup rendered="#{authBean.user.admin}">
+			<h:outputLink value="#{request.contextPath}/app/admin/equipments.xhtml">Equipments</h:outputLink>
+		</h:panelGroup>
+		<h:panelGroup rendered="#{not authBean.user.admin}">
+			<h:outputLink value="#{request.contextPath}/app/equipments.xhtml">Equipments</h:outputLink>
+		</h:panelGroup>
 		<h:panelGroup rendered="#{authBean.user.admin}">
 			<h:outputLink value="#{request.contextPath}/app/admin/members.xhtml">Members</h:outputLink>
 		</h:panelGroup>
 		<h:panelGroup rendered="#{authBean.user.admin}">
-			<h:outputLink value="#{request.contextPath}/app/admin/equipments.xhtml">Equipments</h:outputLink>
-		</h:panelGroup>
-		<h:panelGroup rendered="#{authBean.user.admin}">
 			<h:outputLink value="#{request.contextPath}/app/admin/statistics.xhtml">Statistics</h:outputLink>
 		</h:panelGroup>
-		<h:outputLink value="#{request.contextPath}/app/myStatistics.xhtml">My statistics</h:outputLink>
-		<h:outputLink value="#{request.contextPath}/app/myRentals.xhtml">My rentals</h:outputLink>
 	</nav>
 
 

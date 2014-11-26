@@ -1,4 +1,4 @@
-package hu.bme.vik.szoftarch.climbingorgmanager.web.beans.admin;
+package hu.bme.vik.szoftarch.climbingorgmanager.web.beans;
 
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.EquipmentManager;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
@@ -22,10 +22,6 @@ public class EquipmentsBean implements Serializable {
 	@Getter
 	@Setter
 	private List<Equipment> equipments;
-
-	@Getter
-	@Setter
-	private List<Equipment> filteredEquipments;
 
 	@Getter
 	@Setter
