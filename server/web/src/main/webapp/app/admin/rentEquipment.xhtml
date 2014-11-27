@@ -91,7 +91,8 @@
 				</p:dataTable>
 
 				<h3>Select date</h3>
-				<p:calendar pattern="yyyy. MM. dd."/>
+				<p:calendar value="#{rentalBean.rentUntil}" pattern="yyyy. MM. dd." mindate="calwidget.today()"
+							widgetVar="calwidget"/>
 
 				<p>
 					<p:commandButton value="Send rental" action="#{rentalBean.rent}" ajax="true" update="rentalDialog"

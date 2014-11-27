@@ -1,21 +1,20 @@
 package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.ejb.Local;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EquipmentAlreadyRentedException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchRentalException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UserNotRecognizedMemberException;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
+
+import javax.ejb.Local;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Local
 @Stateless
@@ -66,6 +65,29 @@ public class RentalManager {
 		entityManager.merge(managedEquipment);
 		System.out.println("***** 3");
 	}
+
+	public void rentEquipment(User user, Equipment equipment, Date rentedUntil) throws EquipmentAlreadyRentedException, UserNotRecognizedMemberException {
+		User managedUser = entityManager.merge(user);
+		Equipment managedEquipment = entityManager.merge(equipment);
+		if (managedEquipment.getActualRental() != null) {
+			throw new EquipmentAlreadyRentedException();
+		}
+		if (!managedUser.isRecognizedMember()) {
+			throw new UserNotRecognizedMemberException();
+		}
+
+		Rental rental = new Rental();
+		rental.setUser(managedUser);
+		rental.setRentedOn(new Date());
+		rental.setEquipment(managedEquipment);
+		rental.setRentedUntil(rentedUntil);
+		entityManager.persist(rental);
+
+		managedEquipment.setActualRental(rental);
+		entityManager.merge(managedEquipment);
+
+	}
+
 
 	public void returnEquipment(Rental rental) {
 		Rental managedRental = entityManager.merge(rental);

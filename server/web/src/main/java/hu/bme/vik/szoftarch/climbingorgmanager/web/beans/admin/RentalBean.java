@@ -18,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,10 @@ public class RentalBean implements Serializable {
 
 	@Inject
 	private RentalManager rentalManager;
+
+	@Getter
+	@Setter
+	private Date rentUntil;
 
 	@Getter
 	private User user;
@@ -73,7 +78,7 @@ public class RentalBean implements Serializable {
 		result = new HashMap<Equipment, Integer>();
 		for (Equipment equipment : selectedEquipments) {
 			try {
-				rentalManager.rentEquipment(user, equipment);
+				rentalManager.rentEquipment(user, equipment, rentUntil);
 				result.put(equipment, 0);
 			} catch (EquipmentAlreadyRentedException e) {
 				result.put(equipment, 1);
