@@ -28,16 +28,29 @@ import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.UserData;
 /**
  * Created by Dani on 2014.11.20..
  */
-public class AddUserFrame extends JFrame {
+public class EditUserFrame extends JFrame {
 
-	public AddUserFrame(MainFrame parent) {
+	private User user;
+
+	public EditUserFrame(JFrame parent) {
+		this.user = new User();
+		user.setUserData(new UserData());
+		initGui(parent);
+	}
+
+	public EditUserFrame(JFrame parent, User user) {
+		this.user = user;
+		initGui(parent);
+	}
+
+	private void initGui(JFrame parent) {
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		final Container contentPane = getContentPane();
 
 		JPanel inputPanel = new JPanel();
 		contentPane.add(inputPanel, BorderLayout.CENTER);
 		inputPanel.setLayout(new GridBagLayout());
-		inputPanel.setBorder(new TitledBorder("Create new user"));
+		inputPanel.setBorder(new TitledBorder(user.getId() == null ? "Create new user" : "Edit user"));
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.insets = new Insets(5, 5, 0, 5);
@@ -48,7 +61,7 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy = 0;
 		inputPanel.add(usernameLabel, constraints);
 
-		final JTextField usernameField = new JTextField("hululu", 20);
+		final JTextField usernameField = new JTextField(user.getUserName(), 20);
 		constraints.gridx = 1;
 		inputPanel.add(usernameField, constraints);
 
@@ -57,7 +70,7 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy++;
 		inputPanel.add(passwordLabel, constraints);
 
-		final JPasswordField passwordField = new JPasswordField("hululu", 20);
+		final JPasswordField passwordField = new JPasswordField(20);
 		constraints.gridx = 1;
 		inputPanel.add(passwordField, constraints);
 
@@ -66,7 +79,7 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy++;
 		inputPanel.add(passwordLabel2, constraints);
 
-		final JPasswordField passwordField2 = new JPasswordField("hululu", 20);
+		final JPasswordField passwordField2 = new JPasswordField(20);
 		constraints.gridx = 1;
 		inputPanel.add(passwordField2, constraints);
 
@@ -75,7 +88,7 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy++;
 		inputPanel.add(firstNameLabel, constraints);
 
-		final JTextField firstNameField = new JTextField("Hululu", 20);
+		final JTextField firstNameField = new JTextField(user.getUserData().getFirstName(), 20);
 		constraints.gridx = 1;
 		inputPanel.add(firstNameField, constraints);
 
@@ -84,7 +97,7 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy++;
 		inputPanel.add(lastNameLabel, constraints);
 
-		final JTextField lastNameField = new JTextField("Kiss", 20);
+		final JTextField lastNameField = new JTextField(user.getUserData().getLastName(), 20);
 		constraints.gridx = 1;
 		inputPanel.add(lastNameField, constraints);
 
@@ -93,7 +106,7 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy++;
 		inputPanel.add(addressLabel, constraints);
 
-		final JTextField addressField = new JTextField("Hululu u. 15.", 20);
+		final JTextField addressField = new JTextField(user.getUserData().getAddress(), 20);
 		constraints.gridx = 1;
 		inputPanel.add(addressField, constraints);
 
@@ -102,7 +115,7 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy++;
 		inputPanel.add(emailLabel, constraints);
 
-		final JTextField emailField = new JTextField("hu@lulu.com", 20);
+		final JTextField emailField = new JTextField(user.getEmail(), 20);
 		constraints.gridx = 1;
 		inputPanel.add(emailField, constraints);
 
@@ -111,13 +124,13 @@ public class AddUserFrame extends JFrame {
 		constraints.gridy++;
 		inputPanel.add(adminLabel, constraints);
 
-		final JCheckBox adminCheckBox = new JCheckBox();
+		final JCheckBox adminCheckBox = new JCheckBox("", user.isAdmin());
 		constraints.gridx = 1;
 		inputPanel.add(adminCheckBox, constraints);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-		JButton okButton = new JButton("Create");
+		JButton okButton = new JButton("Save");
 		contentPane.add(buttonPanel, BorderLayout.PAGE_END);
 		buttonPanel.add(okButton);
 		okButton.addActionListener(new ActionListener() {
@@ -126,11 +139,12 @@ public class AddUserFrame extends JFrame {
 				String password = new String(passwordField.getPassword());
 				String password2 = new String(passwordField2.getPassword());
 				if (password.equals(password2)) {
-					UserData userData = new UserData();
+//					UserData userData = new UserData();
+					UserData userData = user.getUserData();
 					userData.setFirstName(firstNameField.getText());
 					userData.setLastName(lastNameField.getText());
 					userData.setAddress(addressField.getText());
-					User user = new User();
+//					User user = new User();
 					user.setUserName(usernameField.getText());
 					user.setUserData(userData);
 					user.setPassword(password);
@@ -140,9 +154,13 @@ public class AddUserFrame extends JFrame {
 					user.setAdmin(adminCheckBox.isSelected());
 
 					Controller controller = Controller.getInstance();
-					controller.addNewUser(user, AddUserFrame.this);
+					if (user.getId() == null) {
+						controller.addNewUser(user, EditUserFrame.this);
+					} else {
+						controller.editUser(user, EditUserFrame.this);
+					}
 				} else {
-					JOptionPane.showMessageDialog(AddUserFrame.this, "Passwords do not match!", "Error",
+					JOptionPane.showMessageDialog(EditUserFrame.this, "Passwords do not match!", "Error",
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
