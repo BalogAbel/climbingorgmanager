@@ -22,6 +22,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
@@ -49,7 +50,9 @@ public class MainFrame extends JFrame {
 					case 1:
 						controller.loadEquipments();
 						break;
-//					case 2: controller.loadEntries(); break;
+					case 2:
+						controller.loadEntries();
+						break;
 				}
 			}
 		});
@@ -60,10 +63,8 @@ public class MainFrame extends JFrame {
 		JPanel equipmentsPanel = createEquipmentsPanel();
 		tabbedPane.addTab("Equipments", equipmentsPanel);
 
-		JPanel entriesPanel = new JPanel();
+		JPanel entriesPanel = createEntriesPanel();
 		tabbedPane.addTab("Entries", entriesPanel);
-
-//		contentPane.add(detailsPanel, BorderLayout.EAST);
 
 		JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel statusBarLabel = new JLabel("Logged in as: " + "SUPERADMIN");
@@ -162,6 +163,21 @@ public class MainFrame extends JFrame {
 		});
 
 		return equipmentsPanel;
+	}
+
+	private JPanel createEntriesPanel() {
+		JPanel entriesPanel = new JPanel(new BorderLayout());
+
+		JXTable entriesTable = new JXTable();
+		JScrollPane scrollPane = new JScrollPane(entriesTable);
+		entriesPanel.add(scrollPane, BorderLayout.CENTER);
+
+		EntriesTableModel entriesTableModel = new EntriesTableModel();
+		entriesTable.setModel(entriesTableModel);
+		entriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		controller.setEntriesTableModel(entriesTableModel);
+
+		return entriesPanel;
 	}
 
 	public static void main(String[] args) {

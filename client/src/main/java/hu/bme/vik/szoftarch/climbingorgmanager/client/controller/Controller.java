@@ -21,10 +21,12 @@ import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.EditEquipmentFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.EditUserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.MainFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.PassChooserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.PassesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.util.GsonMessageBodyHandler;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Entry;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.EquipmentType;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass;
@@ -47,12 +49,10 @@ public class Controller {
 
 	private List<EquipmentType> equipmentTypes;
 
-	//	private UserDetailsPanel equipmentUserDetailPanel;
-//	private UserDetailsPanel usersUserDetailPanel;
 	private UserTableModel userTableModel;
 	private PassesTableModel passesTableModel;
 	private EquipmentTableModel equipmentTableModel;
-	//	private UserRentalsList userRentalsList;
+	private EntriesTableModel entriesTableModel;
 	private MainFrame mainFrame;
 
 	private List<RentalsForSelectedUserLoadedListener> rentalsForSelectedUserLoadedListeners;
@@ -96,6 +96,10 @@ public class Controller {
 
 	public void setEquipmentTableModel(EquipmentTableModel equipmentTableModel) {
 		this.equipmentTableModel = equipmentTableModel;
+	}
+
+	public void setEntriesTableModel(EntriesTableModel entriesTableModel) {
+		this.entriesTableModel = entriesTableModel;
 	}
 
 	public void setPassesTableModel(PassesTableModel passesTableModel) {
@@ -351,31 +355,6 @@ public class Controller {
 		});
 	}
 
-//	public void getRentalsForUser() {
-//		String path = "rentals/" + selectedUser.getId();
-//		createInvoker(path).get(new InvocationCallback<Response>() {
-//			@Override
-//			public void completed(Response response) {
-//				System.out.println(response);
-//				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-//					List<Rental> rentals = response.readEntity(new GenericType<List<Rental>>() {
-//					});
-//					userRentalsList.setRentals(rentals);
-//				} else {
-//					String error = response.readEntity(String.class);
-//					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-//				}
-//			}
-//
-//			@Override
-//			public void failed(Throwable throwable) {
-//				throwable.printStackTrace();
-//				String error = throwable.toString();
-//				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-//			}
-//		});
-//	}
-
 	public void getActiveRentalsForUser() {
 		String path = "rentals/active/" + selectedUser.getId();
 		callGetService(path, new ResponseProcessor() {
@@ -410,6 +389,17 @@ public class Controller {
 						loadEquipments();
 					}
 				});
+	}
+
+	public void loadEntries() {
+		callGetService("entries", new ResponseProcessor() {
+			@Override
+			public void processResponse(Response response) {
+				List<Entry> entries = response.readEntity(new GenericType<List<Entry>>() {
+				});
+				entriesTableModel.setEntries(entries);
+			}
+		});
 	}
 
 	private void callGetService(String path, final ResponseProcessor responseProcessor) {
