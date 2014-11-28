@@ -177,6 +177,9 @@ public class MainFrame extends JFrame {
 		entriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		controller.setEntriesTableModel(entriesTableModel);
 
+		JPanel entriesControlPanel = new EntriesControlPanel(entriesTable);
+		entriesPanel.add(entriesControlPanel, BorderLayout.EAST);
+
 		return entriesPanel;
 	}
 
