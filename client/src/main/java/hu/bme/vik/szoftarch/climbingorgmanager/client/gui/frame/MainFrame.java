@@ -1,4 +1,4 @@
-package hu.bme.vik.szoftarch.climbingorgmanager.client.gui;
+package hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame;
 
 import org.jdesktop.swingx.JXTable;
 
@@ -16,12 +16,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.panel.EntriesControlPanel;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.panel.UserDetailsPanel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
@@ -40,22 +40,22 @@ public class MainFrame extends JFrame {
 		final JTabbedPane tabbedPane = new JTabbedPane();
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
 
-		tabbedPane.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent e) {
-				switch (tabbedPane.getSelectedIndex()) {
-					case 0:
-						controller.loadUsers();
-						break;
-					case 1:
-						controller.loadEquipments();
-						break;
-					case 2:
-						controller.loadEntries();
-						break;
-				}
-			}
-		});
+//		tabbedPane.addChangeListener(new ChangeListener() {
+//			@Override
+//			public void stateChanged(ChangeEvent e) {
+//				switch (tabbedPane.getSelectedIndex()) {
+//					case 0:
+//						controller.loadUsers();
+//						break;
+//					case 1:
+//						controller.loadEquipments();
+//						break;
+//					case 2:
+//						controller.loadEntries();
+//						break;
+//				}
+//			}
+//		});
 
 		JPanel usersPanel = createUsersPanel();
 		tabbedPane.addTab("Users", usersPanel);

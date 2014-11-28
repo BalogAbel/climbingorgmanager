@@ -17,10 +17,10 @@ import javax.ws.rs.core.Response;
 
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.RentalsForSelectedUserLoadedListener;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.SelectedUserChangeListener;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.EditEquipmentFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.EditUserFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.MainFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.PassChooserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditEquipmentFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditUserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.MainFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.PassChooserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.PassesTableModel;
@@ -80,6 +80,10 @@ public class Controller {
 		}
 	}
 
+	public User getSelectedUser() {
+		return selectedUser;
+	}
+
 	public void addRentalsForSelectedUserLoadedListener(RentalsForSelectedUserLoadedListener listener) {
 		rentalsForSelectedUserLoadedListeners.add(listener);
 	}
@@ -92,6 +96,7 @@ public class Controller {
 		this.mainFrame = mainFrame;
 		this.userTableModel = userTableModel;
 		loadEquipmentTypes();
+		loadEntries();
 	}
 
 	public void setEquipmentTableModel(EquipmentTableModel equipmentTableModel) {

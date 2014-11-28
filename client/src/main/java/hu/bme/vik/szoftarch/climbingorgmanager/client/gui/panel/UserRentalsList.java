@@ -1,4 +1,4 @@
-package hu.bme.vik.szoftarch.climbingorgmanager.client.gui;
+package hu.bme.vik.szoftarch.climbingorgmanager.client.gui.panel;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -15,15 +15,12 @@ import javax.swing.SwingUtilities;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 
-/**
- * Created by Dani on 2014.11.24..
- */
 public class UserRentalsList extends JPanel {
 
 	private List<Rental> rentals;
 
 	public UserRentalsList() {
-		this.rentals = new LinkedList<Rental>();
+		this.rentals = new LinkedList<>();
 
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 	}
@@ -53,10 +50,7 @@ public class UserRentalsList extends JPanel {
 
 	private class UserRentalPanel extends JPanel {
 
-		private Rental rental;
-
 		private UserRentalPanel(final Rental rental) {
-			this.rental = rental;
 			setLayout(new FlowLayout(FlowLayout.LEFT));
 
 			JLabel label = new JLabel(rental.getEquipment().getName());

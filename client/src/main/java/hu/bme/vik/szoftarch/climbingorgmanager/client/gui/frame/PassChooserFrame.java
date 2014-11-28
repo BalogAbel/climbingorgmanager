@@ -1,4 +1,4 @@
-package hu.bme.vik.szoftarch.climbingorgmanager.client.gui;
+package hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

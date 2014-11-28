@@ -1,4 +1,4 @@
-package hu.bme.vik.szoftarch.climbingorgmanager.client.gui;
+package hu.bme.vik.szoftarch.climbingorgmanager.client.gui.panel;
 
 import org.jdesktop.swingx.JXCollapsiblePane;
 import org.jdesktop.swingx.JXTable;
@@ -24,6 +24,8 @@ import javax.swing.border.TitledBorder;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.RentalsForSelectedUserLoadedListener;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.SelectedUserChangeListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditUserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.PassChooserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
