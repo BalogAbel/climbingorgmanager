@@ -1,7 +1,6 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.client.gui.panel;
 
 import org.jdesktop.swingx.JXCollapsiblePane;
-import org.jdesktop.swingx.JXTable;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -18,22 +17,19 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.RentalsForSelectedUserLoadedListener;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.SelectedUserChangeListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.ChangeListener;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditUserFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.PassChooserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
 /**
  * Created by Dani on 2014.11.20..
  */
-public class UserDetailsPanel extends JPanel implements SelectedUserChangeListener,
-		RentalsForSelectedUserLoadedListener {
+public class UserDetailsPanel extends JPanel implements ChangeListener {
 
 	private User user;
 	private JLabel nameLabel;
@@ -42,15 +38,15 @@ public class UserDetailsPanel extends JPanel implements SelectedUserChangeListen
 	private JLabel addressLabel;
 	private UserRentalsList userRentalsList;
 
-	private Controller controller;
+	private final UserPassesListPanel userPassesListPanel;
 
 	public UserDetailsPanel(final JFrame parent) {
-		controller = Controller.getInstance();
-		controller.addSelectedUserChangeListener(this);
+		Controller controller = Controller.getInstance();
+		controller.addChangeListener(this);
 
 		setLayout(new BorderLayout());
 		setBorder(new TitledBorder("User details"));
-		setPreferredSize(new Dimension(200, 100));
+		setPreferredSize(new Dimension(300, 100));
 
 		JPanel topPanel = new JPanel();
 		add(topPanel, BorderLayout.CENTER);
@@ -86,21 +82,8 @@ public class UserDetailsPanel extends JPanel implements SelectedUserChangeListen
 		passesPanel.add(passesPane);
 		passesPane.setCollapsed(true);
 
-		JXTable passesTable = new JXTable();
-		JScrollPane passesScrollPane = new JScrollPane(passesTable);
-		passesPane.add(passesScrollPane, BorderLayout.CENTER);
-		passesTable.setVisibleRowCount(5);
-		passesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-		final JButton passesButton = new JButton("Buy ticket/pass");
-		passesPane.add(passesButton, BorderLayout.SOUTH);
-		passesButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				PassChooserFrame frame = new PassChooserFrame();
-				frame.setVisible(true);
-			}
-		});
+		userPassesListPanel = new UserPassesListPanel();
+		passesPane.add(userPassesListPanel, BorderLayout.CENTER);
 
 		final JPanel equipmentsPanel = new JPanel();
 		lowerPanel.add(equipmentsPanel, BorderLayout.SOUTH);
@@ -111,8 +94,8 @@ public class UserDetailsPanel extends JPanel implements SelectedUserChangeListen
 		equipmentsPane.setCollapsed(true);
 
 		userRentalsList = new UserRentalsList();
-		equipmentsPane.add(userRentalsList, BorderLayout.CENTER);
-		controller.addRentalsForSelectedUserLoadedListener(this);
+		JScrollPane scrollPane = new JScrollPane(userRentalsList);
+		equipmentsPane.add(scrollPane, BorderLayout.CENTER);
 
 		// Mouse listeners for toggling collapsible panes
 		equipmentsPanel.addMouseListener(new MouseAdapter() {
@@ -161,6 +144,11 @@ public class UserDetailsPanel extends JPanel implements SelectedUserChangeListen
 	public void onSelectedUserChanged(User selectedUser) {
 		this.user = selectedUser;
 		update();
+	}
+
+	@Override
+	public void onPassesLoaded(List<Pass> passes) {
+		userPassesListPanel.setPasses(passes);
 	}
 
 	@Override

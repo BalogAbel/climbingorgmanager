@@ -1,11 +1,19 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.core.entities;
 
-import lombok.Data;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+
+import lombok.Data;
 
 /**
  * Created by Abel on 2014.11.02..
@@ -48,4 +56,8 @@ public class Pass implements Serializable {
 	private Date validUntil;
 
 	private int timeLeft;
+
+	public boolean isUsable() {
+		return validUntil.compareTo(new Date()) > 0 && timeLeft > 0;
+	}
 }

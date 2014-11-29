@@ -2,7 +2,6 @@ package hu.bme.vik.szoftarch.climbingorgmanager.client.controller;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Future;
 
 import javax.swing.JOptionPane;
 import javax.ws.rs.client.AsyncInvoker;
@@ -15,15 +14,14 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.RentalsForSelectedUserLoadedListener;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.SelectedUserChangeListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.ChangeListener;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditEquipmentFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditUserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.LoginFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.MainFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.PassChooserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.PassesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.util.GsonMessageBodyHandler;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Entry;
@@ -50,13 +48,11 @@ public class Controller {
 	private List<EquipmentType> equipmentTypes;
 
 	private UserTableModel userTableModel;
-	private PassesTableModel passesTableModel;
 	private EquipmentTableModel equipmentTableModel;
 	private EntriesTableModel entriesTableModel;
 	private MainFrame mainFrame;
 
-	private List<RentalsForSelectedUserLoadedListener> rentalsForSelectedUserLoadedListeners;
-	private List<SelectedUserChangeListener> selectedUserChangeListeners;
+	private List<ChangeListener> changeListeners;
 
 	public static Controller getInstance() {
 		if (instance == null) {
@@ -66,17 +62,17 @@ public class Controller {
 	}
 
 	private Controller() {
-		rentalsForSelectedUserLoadedListeners = new LinkedList<>();
-		selectedUserChangeListeners = new LinkedList<>();
+		changeListeners = new LinkedList<>();
 	}
 
 	public void setSelectedUser(User selectedUser) {
 		this.selectedUser = selectedUser;
-		for (SelectedUserChangeListener listener : selectedUserChangeListeners) {
+		for (ChangeListener listener : changeListeners) {
 			listener.onSelectedUserChanged(selectedUser);
 		}
 		if (selectedUser != null) {
 			getActiveRentalsForUser();
+			loadPassesForSelectedUser();
 		}
 	}
 
@@ -84,12 +80,8 @@ public class Controller {
 		return selectedUser;
 	}
 
-	public void addRentalsForSelectedUserLoadedListener(RentalsForSelectedUserLoadedListener listener) {
-		rentalsForSelectedUserLoadedListeners.add(listener);
-	}
-
-	public void addSelectedUserChangeListener(SelectedUserChangeListener listener) {
-		selectedUserChangeListeners.add(listener);
+	public void addChangeListener(ChangeListener listener) {
+		changeListeners.add(listener);
 	}
 
 	public void bind(MainFrame mainFrame, UserTableModel userTableModel) {
@@ -107,8 +99,45 @@ public class Controller {
 		this.entriesTableModel = entriesTableModel;
 	}
 
-	public void setPassesTableModel(PassesTableModel passesTableModel) {
-		this.passesTableModel = passesTableModel;
+	private void setToken(Token token) {
+		this.token = token;
+	}
+
+	public void login(final LoginFrame frame, String username, String password) {
+		Form form = new Form();
+		form.param("username", username);
+		form.param("password", password);
+
+		Client client = ClientBuilder.newClient().register(GsonMessageBodyHandler.class);
+		ClientBuilder.newClient().register(GsonMessageBodyHandler.class);
+
+		client.target(SERVER_URL + "/rest-1.0-SNAPSHOT/rest")
+				.path("users/login").request(MediaType.APPLICATION_JSON_TYPE)
+				.async().post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE),
+				new InvocationCallback<Response>() {
+					@Override
+					public void completed(Response response) {
+						if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+							frame.dispose();
+							setToken(response.readEntity(Token.class));
+							MainFrame frame = new MainFrame(token.getUser());
+							frame.setVisible(true);
+						} else {
+							String error = response.readEntity(String.class);
+							frame.onLoginFailed(error);
+						}
+					}
+
+					@Override
+					public void failed(Throwable throwable) {
+						throwable.printStackTrace();
+						frame.onLoginFailed(throwable.toString());
+					}
+				});
+	}
+
+	public void logout() {
+		this.token = null;
 	}
 
 	public void loadUsers() {
@@ -181,30 +210,6 @@ public class Controller {
 				throwable.printStackTrace();
 				String error = throwable.toString();
 				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		});
-	}
-
-	public void loadPassesForSelectedUser() {
-		Future<Response> responseFuture = createInvoker("passes").get(new InvocationCallback<Response>() {
-			@Override
-			public void completed(Response response) {
-
-				System.out.println(response);
-				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					List<Pass> passes = response.readEntity(new GenericType<List<Pass>>() {
-					});
-					passesTableModel.setPasses(passes);
-				} else {
-					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void failed(Throwable throwable) {
-				throwable.printStackTrace();
-
 			}
 		});
 	}
@@ -291,6 +296,7 @@ public class Controller {
 					public void completed(Response response) {
 						System.out.println(response);
 						if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+							loadPassesForSelectedUser();
 							source.dispose();
 						} else {
 							String error = response.readEntity(String.class);
@@ -367,7 +373,7 @@ public class Controller {
 			public void processResponse(Response response) {
 				List<Rental> rentals = response.readEntity(new GenericType<List<Rental>>() {
 				});
-				for (RentalsForSelectedUserLoadedListener listener : rentalsForSelectedUserLoadedListeners) {
+				for (ChangeListener listener : changeListeners) {
 					listener.onRentalsLoaded(rentals);
 				}
 			}
@@ -407,6 +413,51 @@ public class Controller {
 		});
 	}
 
+	public void loadPassesForSelectedUser() {
+		String path = "passes/" + selectedUser.getId();
+		callGetService(path, new ResponseProcessor() {
+			@Override
+			public void processResponse(Response response) {
+				List<Pass> passes = response.readEntity(new GenericType<List<Pass>>() {
+				});
+				for (ChangeListener listener : changeListeners) {
+					listener.onPassesLoaded(passes);
+				}
+			}
+		});
+	}
+
+	public void enterWithTicket() {
+		String path = "entries/ticket/" + selectedUser.getId();
+		callPostService(path, null, new ResponseProcessor() {
+			@Override
+			public void processResponse(Response response) {
+				loadEntries();
+				JOptionPane.showMessageDialog(mainFrame, "Ticket bought!", "Success", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+	}
+
+	public void enterWithPass(final long userId, long passId) {
+		String path = "entries/pass/" + passId + "/" + userId;
+		Form form = new Form();
+		form.param("userId", Long.toString(userId));
+		form.param("passId", Long.toString(passId));
+		callPutService(path, Entity.entity(form, MediaType.APPLICATION_JSON_TYPE),
+				new ResponseProcessor() {
+					@Override
+					public void processResponse(Response response) {
+						loadEntries();
+						JOptionPane.showMessageDialog(mainFrame, "Pass used!", "Success",
+								JOptionPane.INFORMATION_MESSAGE);
+						if (userId != -1) {
+							loadPassesForSelectedUser();
+						}
+					}
+				});
+	}
+
+	//------ SERVICE METHODS ------
 	private void callGetService(String path, final ResponseProcessor responseProcessor) {
 		createInvoker(path).get(new InvocationCallback<Response>() {
 			@Override
@@ -478,7 +529,7 @@ public class Controller {
 		ClientBuilder.newClient().register(GsonMessageBodyHandler.class);
 		return client.target(SERVER_URL + "/rest-1.0-SNAPSHOT/rest")
 				.path(path).request(MediaType.APPLICATION_JSON_TYPE)
-				.header("Authorization", "magic") //TODO change to token
+				.header("Authorization", token.getToken())
 				.async();
 	}
 

@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UserNotAuthorizedException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
 import hu.bme.vik.szoftarch.climbingorgamanager.backend.managers.UserManager;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
@@ -39,7 +40,9 @@ public class UserService {
 			Token token = manager.loginRest(username, password);
 			return Response.ok().entity(token).build();
 		} catch (BadLoginCredentialsException e) {
-			return Response.status(Response.Status.UNAUTHORIZED).build();
+			return Response.status(Response.Status.UNAUTHORIZED).entity("Username or password incorrect.").build();
+		} catch (UserNotAuthorizedException e) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("User not authorized to log in.").build();
 		}
 
 	}

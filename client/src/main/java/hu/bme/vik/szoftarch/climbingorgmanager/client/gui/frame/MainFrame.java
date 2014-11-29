@@ -32,30 +32,13 @@ public class MainFrame extends JFrame {
 	private UserTableModel userTableModel;
 	private Controller controller;
 
-	public MainFrame() {
+	public MainFrame(User loggedInUser) {
 		controller = Controller.getInstance();
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		Container contentPane = getContentPane();
 
 		final JTabbedPane tabbedPane = new JTabbedPane();
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
-
-//		tabbedPane.addChangeListener(new ChangeListener() {
-//			@Override
-//			public void stateChanged(ChangeEvent e) {
-//				switch (tabbedPane.getSelectedIndex()) {
-//					case 0:
-//						controller.loadUsers();
-//						break;
-//					case 1:
-//						controller.loadEquipments();
-//						break;
-//					case 2:
-//						controller.loadEntries();
-//						break;
-//				}
-//			}
-//		});
 
 		JPanel usersPanel = createUsersPanel();
 		tabbedPane.addTab("Users", usersPanel);
@@ -67,10 +50,20 @@ public class MainFrame extends JFrame {
 		tabbedPane.addTab("Entries", entriesPanel);
 
 		JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		JLabel statusBarLabel = new JLabel("Logged in as: " + "SUPERADMIN");
+		JLabel statusBarLabel = new JLabel("Logged in as: " + loggedInUser.getUserName());
 		statusBar.add(statusBarLabel);
 		JButton logoutButton = new JButton("Logout");
 		statusBar.add(logoutButton);
+		logoutButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.logout();
+				LoginFrame loginFrame = new LoginFrame();
+				loginFrame.setVisible(true);
+
+				dispose();
+			}
+		});
 
 		contentPane.add(statusBar, BorderLayout.SOUTH);
 		pack();
@@ -84,6 +77,18 @@ public class MainFrame extends JFrame {
 	private JPanel createUsersPanel() {
 		JPanel usersPanel = new JPanel(new BorderLayout());
 
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		usersPanel.add(buttonPanel, BorderLayout.NORTH);
+
+		JButton refreshButton = new JButton("Refresh");
+		buttonPanel.add(refreshButton);
+		refreshButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.loadUsers();
+			}
+		});
+
 		UserDetailsPanel detailsPanel = new UserDetailsPanel(this);
 		usersPanel.add(detailsPanel, BorderLayout.EAST);
 
@@ -94,7 +99,6 @@ public class MainFrame extends JFrame {
 		userTableModel = new UserTableModel();
 		userTable.setModel(userTableModel);
 		userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		userTable.setFillsViewportHeight(true);
 
 		ListSelectionModel selectionModel = userTable.getSelectionModel();
 		selectionModel.addListSelectionListener(new ListSelectionListener() {
@@ -126,11 +130,32 @@ public class MainFrame extends JFrame {
 			}
 		});
 
+		JButton guestTicketButton = new JButton("Enter as GUEST");
+		userControlsPanel.add(guestTicketButton);
+		guestTicketButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+//				controller.enterWithTicket(-1l);
+			}
+		});
+
 		return usersPanel;
 	}
 
 	private JPanel createEquipmentsPanel() {
 		JPanel equipmentsPanel = new JPanel(new BorderLayout());
+
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		equipmentsPanel.add(buttonPanel, BorderLayout.NORTH);
+
+		JButton refreshButton = new JButton("Refresh");
+		buttonPanel.add(refreshButton);
+		refreshButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.loadEquipments();
+			}
+		});
 
 		UserDetailsPanel detailsPanel = new UserDetailsPanel(this);
 		equipmentsPanel.add(detailsPanel, BorderLayout.EAST);
@@ -146,8 +171,6 @@ public class MainFrame extends JFrame {
 
 		equipmentTable.getColumn(3).setCellRenderer(new EquipmentTableModel.EquipmentButtonRenderer());
 		equipmentTable.getColumn(3).setCellEditor(new EquipmentTableModel.EquipmentButtonEditor());
-
-		//fillsviewportcucc
 
 		JPanel equipmentControlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		equipmentsPanel.add(equipmentControlsPanel, BorderLayout.SOUTH);
@@ -168,6 +191,18 @@ public class MainFrame extends JFrame {
 	private JPanel createEntriesPanel() {
 		JPanel entriesPanel = new JPanel(new BorderLayout());
 
+		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		entriesPanel.add(buttonPanel, BorderLayout.NORTH);
+
+		JButton refreshButton = new JButton("Refresh");
+		buttonPanel.add(refreshButton);
+		refreshButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				controller.loadEntries();
+			}
+		});
+
 		JXTable entriesTable = new JXTable();
 		JScrollPane scrollPane = new JScrollPane(entriesTable);
 		entriesPanel.add(scrollPane, BorderLayout.CENTER);
@@ -184,11 +219,11 @@ public class MainFrame extends JFrame {
 	}
 
 	public static void main(String[] args) {
-//		LoginFrame loginFrame = new LoginFrame();
-//		loginFrame.setVisible(true);
+		LoginFrame loginFrame = new LoginFrame();
+		loginFrame.setVisible(true);
 
-		MainFrame mainFrame = new MainFrame();
-		mainFrame.setVisible(true);
+//		MainFrame mainFrame = new MainFrame();
+//		mainFrame.setVisible(true);
 
 	}
 }

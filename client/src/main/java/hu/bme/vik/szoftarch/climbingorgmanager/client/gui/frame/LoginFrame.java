@@ -12,22 +12,18 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import hu.bme.vik.szoftarch.climbingorgmanager.client.util.GsonMessageBodyHandler;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
 
 public class LoginFrame extends JFrame {
+
+	private JTextField usernameField;
+	private JPasswordField passwordField;
 
 	public LoginFrame() {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -44,7 +40,7 @@ public class LoginFrame extends JFrame {
 		constraints.gridy = 0;
 		inputPanel.add(usernameLabel, constraints);
 
-		final JTextField usernameField = new JTextField("teszt", 20);
+		usernameField = new JTextField("admin", 20);
 		constraints.gridx = 1;
 		inputPanel.add(usernameField, constraints);
 
@@ -53,7 +49,7 @@ public class LoginFrame extends JFrame {
 		constraints.gridy = 1;
 		inputPanel.add(passwordLabel, constraints);
 
-		final JPasswordField passwordField = new JPasswordField("password", 20);
+		passwordField = new JPasswordField("password", 20);
 		constraints.gridx = 1;
 		inputPanel.add(passwordField, constraints);
 
@@ -62,7 +58,7 @@ public class LoginFrame extends JFrame {
 		JButton okButton = new JButton("Sign in");
 		buttonPanel.add(okButton);
 
-		SignInActionListener listener = new SignInActionListener(usernameField, passwordField);
+		SignInActionListener listener = new SignInActionListener();
 		okButton.addActionListener(listener);
 		usernameField.addActionListener(listener);
 		passwordField.addActionListener(listener);
@@ -73,51 +69,21 @@ public class LoginFrame extends JFrame {
 		setLocationRelativeTo(null);
 	}
 
+	public void onLoginFailed(String error) {
+		usernameField.setEnabled(true);
+		passwordField.setEnabled(true);
+		JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+
 	private class SignInActionListener implements ActionListener {
-
-		private JTextField usernameField;
-		private JPasswordField passwordField;
-
-		private SignInActionListener(JTextField usernameField, JPasswordField passwordField) {
-			this.usernameField = usernameField;
-			this.passwordField = passwordField;
-		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			usernameField.setEnabled(false);
 			passwordField.setEnabled(false);
 
-			Form form = new Form();
-			form.param("username", usernameField.getText());
-			form.param("password", new String(passwordField.getPassword()));
-			Client client = ClientBuilder.newClient().register(GsonMessageBodyHandler.class);
-			client.target("http://climbingorgmanager-asztalosdani.rhcloud.com/rest-1.0-SNAPSHOT/rest")
-					.path("users/login").request(MediaType.APPLICATION_JSON_TYPE)
-					.async().post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE),
-					new InvocationCallback<Response>() {
-						@Override
-						public void completed(Response response) {
-							usernameField.setEnabled(true);
-							passwordField.setEnabled(true);
-
-							System.out.println(response);
-							Token token = response.readEntity(Token.class);
-							System.out.println("Token: " + token.getToken());
-							System.out.println("User: " + token.getUser().getUserName());
-							MainFrame frame = new MainFrame();
-							frame.setVisible(true);
-							LoginFrame.this.setVisible(false);
-						}
-
-						@Override
-						public void failed(Throwable throwable) {
-							System.out.println("Invocation failed.");
-							throwable.printStackTrace();
-							usernameField.setEnabled(true);
-							passwordField.setEnabled(true);
-						}
-					});
+			Controller controller = Controller.getInstance();
+			controller.login(LoginFrame.this, usernameField.getText(), new String(passwordField.getPassword()));
 		}
 	}
 }

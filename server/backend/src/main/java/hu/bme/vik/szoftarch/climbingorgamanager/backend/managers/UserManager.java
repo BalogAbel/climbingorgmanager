@@ -1,14 +1,12 @@
 package hu.bme.vik.szoftarch.climbingorgamanager.backend.managers;
 
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
-import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 import org.jasypt.util.password.BasicPasswordEncryptor;
+
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.List;
 
 import javax.ejb.Local;
 import javax.ejb.Stateless;
@@ -16,11 +14,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.Date;
-import java.util.List;
+
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.BadLoginCredentialsException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.EmailAlreadyRegisteredException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.NoSuchUserException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UserNotAuthorizedException;
+import hu.bme.vik.szoftarch.climbingorgamanager.backend.exceptions.UsernameAlreadyRegisteredException;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
 @Local
 @Stateless
@@ -39,9 +42,12 @@ public class UserManager implements Serializable {
 		return tokens.get(0);
 	}
 
-	public Token loginRest(String username, String password) throws BadLoginCredentialsException {
+	public Token loginRest(String username, String password)
+			throws BadLoginCredentialsException, UserNotAuthorizedException {
 		User user = login(username, password);
-		if (!user.isAdmin()) throw new BadLoginCredentialsException();
+		if (!user.isAdmin()) {
+			throw new UserNotAuthorizedException();
+		}
 		Token token = new Token();
 
 		SecureRandom random = new SecureRandom();
@@ -106,6 +112,9 @@ public class UserManager implements Serializable {
 	}
 
 	public void editUser(User user) {
+		BasicPasswordEncryptor encryptor = new BasicPasswordEncryptor();
+		String encryptedPassword = encryptor.encryptPassword(user.getPassword());
+		user.setPassword(encryptedPassword);
 		entityManager.merge(user);
 	}
 
