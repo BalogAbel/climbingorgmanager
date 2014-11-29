@@ -6,11 +6,15 @@ import org.jdesktop.swingx.JXTable;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -18,12 +22,16 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.TitledBorder;
 
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.RentalsForSelectedUserLoadedListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.SelectedUserChangeListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
 /**
  * Created by Dani on 2014.11.20..
  */
-public class UserDetailsPanel extends JPanel {
+public class UserDetailsPanel extends JPanel implements SelectedUserChangeListener,
+		RentalsForSelectedUserLoadedListener {
 
 	private User user;
 	private JLabel nameLabel;
@@ -34,8 +42,9 @@ public class UserDetailsPanel extends JPanel {
 
 	private Controller controller;
 
-	public UserDetailsPanel() {
+	public UserDetailsPanel(final JFrame parent) {
 		controller = Controller.getInstance();
+		controller.addSelectedUserChangeListener(this);
 
 		setLayout(new BorderLayout());
 		setBorder(new TitledBorder("User details"));
@@ -54,6 +63,16 @@ public class UserDetailsPanel extends JPanel {
 		addressLabel = new JLabel();
 		topPanel.add(addressLabel);
 
+		JButton editButton = new JButton("Edit user");
+		topPanel.add(editButton);
+		editButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EditUserFrame editUserFrame = new EditUserFrame(parent, user);
+				editUserFrame.setVisible(true);
+			}
+		});
+
 		JPanel lowerPanel = new JPanel(new BorderLayout());
 		add(lowerPanel, BorderLayout.SOUTH);
 
@@ -63,6 +82,7 @@ public class UserDetailsPanel extends JPanel {
 
 		final JXCollapsiblePane passesPane = new JXCollapsiblePane();
 		passesPanel.add(passesPane);
+		passesPane.setCollapsed(true);
 
 		JXTable passesTable = new JXTable();
 		JScrollPane passesScrollPane = new JScrollPane(passesTable);
@@ -86,10 +106,11 @@ public class UserDetailsPanel extends JPanel {
 
 		final JXCollapsiblePane equipmentsPane = new JXCollapsiblePane();
 		equipmentsPanel.add(equipmentsPane);
+		equipmentsPane.setCollapsed(true);
 
 		userRentalsList = new UserRentalsList();
 		equipmentsPane.add(userRentalsList, BorderLayout.CENTER);
-		controller.setUserRentalsList(userRentalsList);
+		controller.addRentalsForSelectedUserLoadedListener(this);
 
 		// Mouse listeners for toggling collapsible panes
 		equipmentsPanel.addMouseListener(new MouseAdapter() {
@@ -119,17 +140,29 @@ public class UserDetailsPanel extends JPanel {
 
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	private void update() {
+		if (user == null) {
+			nameLabel.setText("Select a user!");
+			usernameLabel.setText("");
+			emailLabel.setText("");
+			addressLabel.setText("");
+		} else {
+			nameLabel.setText(user.getUserData().getFirstName() + " " + user.getUserData().getLastName());
+			usernameLabel.setText(user.getUserName());
+			emailLabel.setText(user.getEmail());
+			addressLabel.setText(user.getUserData().getAddress());
+		}
+
+	}
+
+	@Override
+	public void onSelectedUserChanged(User selectedUser) {
+		this.user = selectedUser;
 		update();
 	}
 
-	private void update() {
-		nameLabel.setText(user.getUserData().getFirstName() + " " + user.getUserData().getLastName());
-		usernameLabel.setText(user.getUserName());
-		emailLabel.setText(user.getEmail());
-		addressLabel.setText(user.getUserData().getAddress());
-
-		controller.getActiveRentalsForUser();
+	@Override
+	public void onRentalsLoaded(List<Rental> rentals) {
+		userRentalsList.setRentals(rentals);
 	}
 }

@@ -1,5 +1,6 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.client.controller;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -14,16 +15,20 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.AddUserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.RentalsForSelectedUserLoadedListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.SelectedUserChangeListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.EditEquipmentFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.EditUserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.MainFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.PassChooserFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.UserDetailsPanel;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.UserRentalsList;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.PassesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.util.GsonMessageBodyHandler;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Entry;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.EquipmentType;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
@@ -42,12 +47,16 @@ public class Controller {
 	private User selectedUser;
 	private Token token;
 
-	private UserDetailsPanel userDetailsPanel;
+	private List<EquipmentType> equipmentTypes;
+
 	private UserTableModel userTableModel;
 	private PassesTableModel passesTableModel;
 	private EquipmentTableModel equipmentTableModel;
-	private UserRentalsList userRentalsList;
+	private EntriesTableModel entriesTableModel;
 	private MainFrame mainFrame;
+
+	private List<RentalsForSelectedUserLoadedListener> rentalsForSelectedUserLoadedListeners;
+	private List<SelectedUserChangeListener> selectedUserChangeListeners;
 
 	public static Controller getInstance() {
 		if (instance == null) {
@@ -57,25 +66,40 @@ public class Controller {
 	}
 
 	private Controller() {
+		rentalsForSelectedUserLoadedListeners = new LinkedList<>();
+		selectedUserChangeListeners = new LinkedList<>();
 	}
 
 	public void setSelectedUser(User selectedUser) {
 		this.selectedUser = selectedUser;
-		userDetailsPanel.setUser(selectedUser);
+		for (SelectedUserChangeListener listener : selectedUserChangeListeners) {
+			listener.onSelectedUserChanged(selectedUser);
+		}
+		if (selectedUser != null) {
+			getActiveRentalsForUser();
+		}
 	}
 
-	public void bind(MainFrame mainFrame, UserTableModel userTableModel, UserDetailsPanel userDetailsPanel) {
+	public void addRentalsForSelectedUserLoadedListener(RentalsForSelectedUserLoadedListener listener) {
+		rentalsForSelectedUserLoadedListeners.add(listener);
+	}
+
+	public void addSelectedUserChangeListener(SelectedUserChangeListener listener) {
+		selectedUserChangeListeners.add(listener);
+	}
+
+	public void bind(MainFrame mainFrame, UserTableModel userTableModel) {
 		this.mainFrame = mainFrame;
 		this.userTableModel = userTableModel;
-		this.userDetailsPanel = userDetailsPanel;
+		loadEquipmentTypes();
 	}
 
 	public void setEquipmentTableModel(EquipmentTableModel equipmentTableModel) {
 		this.equipmentTableModel = equipmentTableModel;
 	}
 
-	public void setUserRentalsList(UserRentalsList userRentalsList) {
-		this.userRentalsList = userRentalsList;
+	public void setEntriesTableModel(EntriesTableModel entriesTableModel) {
+		this.entriesTableModel = entriesTableModel;
 	}
 
 	public void setPassesTableModel(PassesTableModel passesTableModel) {
@@ -104,6 +128,32 @@ public class Controller {
 				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		});
+	}
+
+	private void loadEquipmentTypes() {
+		createInvoker("equipments/types").get(new InvocationCallback<Response>() {
+			@Override
+			public void completed(Response response) {
+				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+					equipmentTypes = response.readEntity(new GenericType<List<EquipmentType>>() {
+					});
+				} else {
+					String error = response.readEntity(String.class);
+					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			@Override
+			public void failed(Throwable throwable) {
+				throwable.printStackTrace();
+				String error = throwable.toString();
+				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		});
+	}
+
+	public List<EquipmentType> getEquipmentTypes() {
+		return equipmentTypes;
 	}
 
 	public void loadEquipments() {
@@ -154,8 +204,32 @@ public class Controller {
 		});
 	}
 
-	public void addNewUser(User user, final AddUserFrame source) {
+	public void addNewUser(User user, final EditUserFrame source) {
 		createInvoker("users").post(Entity.entity(user, MediaType.APPLICATION_JSON_TYPE),
+				new InvocationCallback<Response>() {
+					@Override
+					public void completed(Response response) {
+						System.out.println(response);
+						if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+							source.dispose();
+							loadUsers();
+						} else {
+							String error = response.readEntity(String.class);
+							JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
+						}
+					}
+
+					@Override
+					public void failed(Throwable throwable) {
+						throwable.printStackTrace();
+						String error = throwable.toString();
+						JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
+					}
+				});
+	}
+
+	public void editUser(User user, final EditUserFrame source) {
+		createInvoker("users").put(Entity.entity(user, MediaType.APPLICATION_JSON_TYPE),
 				new InvocationCallback<Response>() {
 					@Override
 					public void completed(Response response) {
@@ -239,6 +313,7 @@ public class Controller {
 					JOptionPane.showMessageDialog(mainFrame, "Successfully rented!", "Success",
 							JOptionPane.INFORMATION_MESSAGE);
 					loadEquipments();
+					getActiveRentalsForUser();
 				} else {
 					String error = response.readEntity(String.class);
 					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
@@ -264,32 +339,7 @@ public class Controller {
 					JOptionPane.showMessageDialog(mainFrame, "Successfully returned!", "Success",
 							JOptionPane.INFORMATION_MESSAGE);
 					loadEquipments();
-					getRentalsForUser();
-				} else {
-					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void failed(Throwable throwable) {
-				throwable.printStackTrace();
-				String error = throwable.toString();
-				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-			}
-		});
-	}
-
-	public void getRentalsForUser() {
-		String path = "rentals/" + selectedUser.getId();
-		createInvoker(path).get(new InvocationCallback<Response>() {
-			@Override
-			public void completed(Response response) {
-				System.out.println(response);
-				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					List<Rental> rentals = response.readEntity(new GenericType<List<Rental>>() {
-					});
-					userRentalsList.setRentals(rentals);
+					getActiveRentalsForUser();
 				} else {
 					String error = response.readEntity(String.class);
 					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
@@ -312,13 +362,92 @@ public class Controller {
 			public void processResponse(Response response) {
 				List<Rental> rentals = response.readEntity(new GenericType<List<Rental>>() {
 				});
-				userRentalsList.setRentals(rentals);
+				for (RentalsForSelectedUserLoadedListener listener : rentalsForSelectedUserLoadedListeners) {
+					listener.onRentalsLoaded(rentals);
+				}
+			}
+		});
+	}
+
+	public void addEquipment(final EditEquipmentFrame source, Equipment equipment) {
+		callPostService("equipments", Entity.entity(equipment, MediaType.APPLICATION_JSON_TYPE),
+				new ResponseProcessor() {
+					@Override
+					public void processResponse(Response response) {
+						source.dispose();
+						loadEquipments();
+					}
+				});
+	}
+
+	public void editEquipment(final EditEquipmentFrame source, Equipment equipment) {
+		callPutService("equipments", Entity.entity(equipment, MediaType.APPLICATION_JSON_TYPE),
+				new ResponseProcessor() {
+					@Override
+					public void processResponse(Response response) {
+						source.dispose();
+						loadEquipments();
+					}
+				});
+	}
+
+	public void loadEntries() {
+		callGetService("entries", new ResponseProcessor() {
+			@Override
+			public void processResponse(Response response) {
+				List<Entry> entries = response.readEntity(new GenericType<List<Entry>>() {
+				});
+				entriesTableModel.setEntries(entries);
 			}
 		});
 	}
 
 	private void callGetService(String path, final ResponseProcessor responseProcessor) {
 		createInvoker(path).get(new InvocationCallback<Response>() {
+			@Override
+			public void completed(Response response) {
+				System.out.println(response);
+				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+					responseProcessor.processResponse(response);
+				} else {
+					String error = response.readEntity(String.class);
+					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			@Override
+			public void failed(Throwable throwable) {
+				throwable.printStackTrace();
+				String error = throwable.toString();
+				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		});
+	}
+
+	private void callPostService(String path, Entity entity, final ResponseProcessor responseProcessor) {
+		createInvoker(path).post(entity, new InvocationCallback<Response>() {
+			@Override
+			public void completed(Response response) {
+				System.out.println(response);
+				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+					responseProcessor.processResponse(response);
+				} else {
+					String error = response.readEntity(String.class);
+					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
+			@Override
+			public void failed(Throwable throwable) {
+				throwable.printStackTrace();
+				String error = throwable.toString();
+				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		});
+	}
+
+	private void callPutService(String path, Entity entity, final ResponseProcessor responseProcessor) {
+		createInvoker(path).put(entity, new InvocationCallback<Response>() {
 			@Override
 			public void completed(Response response) {
 				System.out.println(response);

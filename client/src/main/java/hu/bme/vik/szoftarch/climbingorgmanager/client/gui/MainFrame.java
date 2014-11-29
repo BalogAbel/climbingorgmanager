@@ -16,17 +16,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.WindowConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
 public class MainFrame extends JFrame {
 
-	private UserDetailsPanel detailsPanel;
 	private UserTableModel userTableModel;
 	private Controller controller;
 
@@ -35,8 +37,25 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		Container contentPane = getContentPane();
 
-		JTabbedPane tabbedPane = new JTabbedPane();
+		final JTabbedPane tabbedPane = new JTabbedPane();
 		contentPane.add(tabbedPane, BorderLayout.CENTER);
+
+		tabbedPane.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				switch (tabbedPane.getSelectedIndex()) {
+					case 0:
+						controller.loadUsers();
+						break;
+					case 1:
+						controller.loadEquipments();
+						break;
+					case 2:
+						controller.loadEntries();
+						break;
+				}
+			}
+		});
 
 		JPanel usersPanel = createUsersPanel();
 		tabbedPane.addTab("Users", usersPanel);
@@ -44,11 +63,8 @@ public class MainFrame extends JFrame {
 		JPanel equipmentsPanel = createEquipmentsPanel();
 		tabbedPane.addTab("Equipments", equipmentsPanel);
 
-		JPanel entriesPanel = new JPanel();
+		JPanel entriesPanel = createEntriesPanel();
 		tabbedPane.addTab("Entries", entriesPanel);
-
-		detailsPanel = new UserDetailsPanel();
-		contentPane.add(detailsPanel, BorderLayout.EAST);
 
 		JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel statusBarLabel = new JLabel("Logged in as: " + "SUPERADMIN");
@@ -60,13 +76,17 @@ public class MainFrame extends JFrame {
 		pack();
 		setLocationRelativeTo(null);
 
-		controller.bind(this, userTableModel, detailsPanel);
+		controller.bind(this, userTableModel);
 		controller.loadUsers();
 		controller.loadEquipments();
 	}
 
 	private JPanel createUsersPanel() {
 		JPanel usersPanel = new JPanel(new BorderLayout());
+
+		UserDetailsPanel detailsPanel = new UserDetailsPanel(this);
+		usersPanel.add(detailsPanel, BorderLayout.EAST);
+
 		final JXTable userTable = new JXTable();
 		JScrollPane scrollPane = new JScrollPane(userTable);
 		usersPanel.add(scrollPane, BorderLayout.CENTER);
@@ -74,7 +94,7 @@ public class MainFrame extends JFrame {
 		userTableModel = new UserTableModel();
 		userTable.setModel(userTableModel);
 		userTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		userTable.setFillsViewportHeight(true);
+//		userTable.setFillsViewportHeight(true);
 
 		ListSelectionModel selectionModel = userTable.getSelectionModel();
 		selectionModel.addListSelectionListener(new ListSelectionListener() {
@@ -84,8 +104,12 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				int selectedIndex = userTable.getSelectedRow();
-				User selectedUser = userTableModel.getUser(selectedIndex);
-				controller.setSelectedUser(selectedUser);
+				if (selectedIndex > -1) {
+					User selectedUser = userTableModel.getUser(selectedIndex);
+					controller.setSelectedUser(selectedUser);
+				} else {
+					controller.setSelectedUser(null);
+				}
 			}
 		});
 
@@ -97,7 +121,7 @@ public class MainFrame extends JFrame {
 		newUserButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AddUserFrame frame = new AddUserFrame(MainFrame.this);
+				EditUserFrame frame = new EditUserFrame(MainFrame.this);
 				frame.setVisible(true);
 			}
 		});
@@ -107,6 +131,10 @@ public class MainFrame extends JFrame {
 
 	private JPanel createEquipmentsPanel() {
 		JPanel equipmentsPanel = new JPanel(new BorderLayout());
+
+		UserDetailsPanel detailsPanel = new UserDetailsPanel(this);
+		equipmentsPanel.add(detailsPanel, BorderLayout.EAST);
+
 		JXTable equipmentTable = new JXTable();
 		JScrollPane scrollPane = new JScrollPane(equipmentTable);
 		equipmentsPanel.add(scrollPane, BorderLayout.CENTER);
@@ -121,9 +149,38 @@ public class MainFrame extends JFrame {
 
 		//fillsviewportcucc
 
-		//TODO new equipment
+		JPanel equipmentControlsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		equipmentsPanel.add(equipmentControlsPanel, BorderLayout.SOUTH);
+
+		JButton newEquipmentButton = new JButton("Add new equipment");
+		equipmentControlsPanel.add(newEquipmentButton);
+		newEquipmentButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				EditEquipmentFrame frame = new EditEquipmentFrame(MainFrame.this);
+				frame.setVisible(true);
+			}
+		});
 
 		return equipmentsPanel;
+	}
+
+	private JPanel createEntriesPanel() {
+		JPanel entriesPanel = new JPanel(new BorderLayout());
+
+		JXTable entriesTable = new JXTable();
+		JScrollPane scrollPane = new JScrollPane(entriesTable);
+		entriesPanel.add(scrollPane, BorderLayout.CENTER);
+
+		EntriesTableModel entriesTableModel = new EntriesTableModel();
+		entriesTable.setModel(entriesTableModel);
+		entriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		controller.setEntriesTableModel(entriesTableModel);
+
+		JPanel entriesControlPanel = new EntriesControlPanel(entriesTable);
+		entriesPanel.add(entriesControlPanel, BorderLayout.EAST);
+
+		return entriesPanel;
 	}
 
 	public static void main(String[] args) {
