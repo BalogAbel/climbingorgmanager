@@ -124,6 +124,7 @@ public class EnterBean implements Serializable {
 		passManager.buyPass(user, timeLeft, validMonth);
 		timeLeft = 0;
 		validMonth = 0;
+		updatePasses();
 		FacesContext.getCurrentInstance().addMessage("entry", new FacesMessage("Successful", "Entry with ticket was successful"));
 
 	}
