@@ -49,7 +49,7 @@ public class UserPassesListPanel extends JPanel {
 			JPanel listPanel = new JPanel();
 			JScrollPane scrollPane = new JScrollPane(listPanel);
 			add(scrollPane, BorderLayout.CENTER);
-			scrollPane.setPreferredSize(new Dimension(250, 200));
+			scrollPane.setMaximumSize(new Dimension(250, 200));
 			listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.PAGE_AXIS));
 
 			for (Pass pass : passes) {

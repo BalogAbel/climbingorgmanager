@@ -3,6 +3,7 @@ package hu.bme.vik.szoftarch.climbingorgmanager.client.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.ws.rs.client.AsyncInvoker;
 import javax.ws.rs.client.Client;
@@ -46,6 +47,7 @@ public class Controller {
 	private Token token;
 
 	private List<EquipmentType> equipmentTypes;
+	private List<User> users;
 
 	private UserTableModel userTableModel;
 	private EquipmentTableModel equipmentTableModel;
@@ -63,6 +65,15 @@ public class Controller {
 
 	private Controller() {
 		changeListeners = new LinkedList<>();
+	}
+
+	public void setSelectedUser(long id) {
+		for (User user : users) {
+			if (user.getId() == id) {
+				setSelectedUser(user);
+				return;
+			}
+		}
 	}
 
 	public void setSelectedUser(User selectedUser) {
@@ -141,47 +152,22 @@ public class Controller {
 	}
 
 	public void loadUsers() {
-		createInvoker("users").get(new InvocationCallback<Response>() {
+		callGetService("users", new ResponseProcessor() {
 			@Override
-			public void completed(Response response) {
-				System.out.println(response);
-				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					List<User> users = response.readEntity(new GenericType<List<User>>() {
-					});
-					userTableModel.setUsers(users);
-				} else {
-					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void failed(Throwable throwable) {
-				throwable.printStackTrace();
-				String error = throwable.toString();
-				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			public void processResponse(Response response) {
+				users = response.readEntity(new GenericType<List<User>>() {
+				});
+				userTableModel.setUsers(users);
 			}
 		});
 	}
 
 	private void loadEquipmentTypes() {
-		createInvoker("equipments/types").get(new InvocationCallback<Response>() {
+		callGetService("equipments/types", new ResponseProcessor() {
 			@Override
-			public void completed(Response response) {
-				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					equipmentTypes = response.readEntity(new GenericType<List<EquipmentType>>() {
-					});
-				} else {
-					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void failed(Throwable throwable) {
-				throwable.printStackTrace();
-				String error = throwable.toString();
-				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			public void processResponse(Response response) {
+				equipmentTypes = response.readEntity(new GenericType<List<EquipmentType>>() {
+				});
 			}
 		});
 	}
@@ -191,51 +177,24 @@ public class Controller {
 	}
 
 	public void loadEquipments() {
-		createInvoker("equipments").get(new InvocationCallback<Response>() {
+		callGetService("equipments", new ResponseProcessor() {
 			@Override
-			public void completed(Response response) {
-				System.out.println(response);
-				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					List<Equipment> equipments = response.readEntity(new GenericType<List<Equipment>>() {
-					});
-					equipmentTableModel.setEquipments(equipments);
-				} else {
-					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void failed(Throwable throwable) {
-				throwable.printStackTrace();
-				String error = throwable.toString();
-				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			public void processResponse(Response response) {
+				List<Equipment> equipments = response.readEntity(new GenericType<List<Equipment>>() {
+				});
+				equipmentTableModel.setEquipments(equipments);
 			}
 		});
 	}
 
 	public void addNewUser(User user, final EditUserFrame source) {
-		createInvoker("users").post(Entity.entity(user, MediaType.APPLICATION_JSON_TYPE),
-				new InvocationCallback<Response>() {
-					@Override
-					public void completed(Response response) {
-						System.out.println(response);
-						if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-							source.dispose();
-							loadUsers();
-						} else {
-							String error = response.readEntity(String.class);
-							JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
-						}
-					}
-
-					@Override
-					public void failed(Throwable throwable) {
-						throwable.printStackTrace();
-						String error = throwable.toString();
-						JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
-					}
-				});
+		callPostService(source, "users", Entity.entity(user, MediaType.APPLICATION_JSON_TYPE), new ResponseProcessor() {
+			@Override
+			public void processResponse(Response response) {
+				source.dispose();
+				loadUsers();
+			}
+		});
 	}
 
 	public void editUser(User user, final EditUserFrame source) {
@@ -263,7 +222,6 @@ public class Controller {
 	}
 
 	public void buyPass(int passId, final PassChooserFrame source) {
-		System.out.println("Buying");
 		int validMonths = 0;
 		int timeLeft = 0;
 		switch (passId) {
@@ -290,78 +248,38 @@ public class Controller {
 		form.param("validMonths", Integer.toString(validMonths));
 		form.param("timeLeft", Integer.toString(timeLeft));
 
-		createInvoker("passes/buy").post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE),
-				new InvocationCallback<Response>() {
+		callPostService(source, "passes/buy", Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE),
+				new ResponseProcessor() {
 					@Override
-					public void completed(Response response) {
-						System.out.println(response);
-						if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-							loadPassesForSelectedUser();
-							source.dispose();
-						} else {
-							String error = response.readEntity(String.class);
-							JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
-						}
-					}
-
-					@Override
-					public void failed(Throwable throwable) {
-						throwable.printStackTrace();
-						String error = throwable.toString();
-						JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
+					public void processResponse(Response response) {
+						loadPassesForSelectedUser();
+						source.dispose();
 					}
 				});
-
 	}
 
 	public void rentEquipment(long equipmentId) {
 		String path = "rentals/rent/" + selectedUser.getId() + "/" + equipmentId;
-		createInvoker(path).post(null, new InvocationCallback<Response>() {
+		callPostService(path, null, new ResponseProcessor() {
 			@Override
-			public void completed(Response response) {
-				System.out.println(response);
-				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					JOptionPane.showMessageDialog(mainFrame, "Successfully rented!", "Success",
-							JOptionPane.INFORMATION_MESSAGE);
-					loadEquipments();
-					getActiveRentalsForUser();
-				} else {
-					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void failed(Throwable throwable) {
-				throwable.printStackTrace();
-				String error = throwable.toString();
-				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			public void processResponse(Response response) {
+				JOptionPane.showMessageDialog(mainFrame, "Successfully rented!", "Success",
+						JOptionPane.INFORMATION_MESSAGE);
+				loadEquipments();
+				getActiveRentalsForUser();
 			}
 		});
 	}
 
 	public void returnEquipment(long rentalId) {
 		String path = "rentals/return/" + rentalId;
-		createInvoker(path).post(null, new InvocationCallback<Response>() {
+		callPostService(path, null, new ResponseProcessor() {
 			@Override
-			public void completed(Response response) {
-				System.out.println(response);
-				if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-					JOptionPane.showMessageDialog(mainFrame, "Successfully returned!", "Success",
-							JOptionPane.INFORMATION_MESSAGE);
-					loadEquipments();
-					getActiveRentalsForUser();
-				} else {
-					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-
-			@Override
-			public void failed(Throwable throwable) {
-				throwable.printStackTrace();
-				String error = throwable.toString();
-				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+			public void processResponse(Response response) {
+				JOptionPane.showMessageDialog(mainFrame, "Successfully returned!", "Success",
+						JOptionPane.INFORMATION_MESSAGE);
+				loadEquipments();
+				getActiveRentalsForUser();
 			}
 		});
 	}
@@ -481,6 +399,11 @@ public class Controller {
 	}
 
 	private void callPostService(String path, Entity entity, final ResponseProcessor responseProcessor) {
+		callPostService(mainFrame, path, entity, responseProcessor);
+	}
+
+	private void callPostService(final JFrame source, String path, Entity entity,
+			final ResponseProcessor responseProcessor) {
 		createInvoker(path).post(entity, new InvocationCallback<Response>() {
 			@Override
 			public void completed(Response response) {
@@ -489,7 +412,7 @@ public class Controller {
 					responseProcessor.processResponse(response);
 				} else {
 					String error = response.readEntity(String.class);
-					JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 
@@ -497,7 +420,7 @@ public class Controller {
 			public void failed(Throwable throwable) {
 				throwable.printStackTrace();
 				String error = throwable.toString();
-				JOptionPane.showMessageDialog(mainFrame, error, "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(source, error, "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 	}

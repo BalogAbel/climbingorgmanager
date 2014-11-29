@@ -162,10 +162,10 @@ public class EquipmentTableModel extends AbstractTableModel {
 
 		public Object getCellEditorValue() {
 			if (isPushed) {
+				Controller controller = Controller.getInstance();
 				if (rented) {
-					//TODO select user
+					controller.setSelectedUser(id);
 				} else {
-					Controller controller = Controller.getInstance();
 					controller.rentEquipment(id);
 				}
 			}
