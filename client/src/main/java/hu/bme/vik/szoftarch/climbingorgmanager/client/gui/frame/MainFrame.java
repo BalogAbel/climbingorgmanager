@@ -135,7 +135,8 @@ public class MainFrame extends JFrame {
 		guestTicketButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				controller.enterWithTicket(-1l);
+				controller.enterWithTicket(-1l);
+
 			}
 		});
 

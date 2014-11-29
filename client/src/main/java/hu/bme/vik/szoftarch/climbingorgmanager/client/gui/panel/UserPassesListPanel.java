@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 
 import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.PassChooserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.UserChooserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass;
 import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
@@ -130,6 +131,13 @@ public class UserPassesListPanel extends JPanel {
 				constraints.gridx++;
 				constraints.anchor = GridBagConstraints.EAST;
 				add(useForSomeoneButton, constraints);
+				useForSomeoneButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						UserChooserFrame frame = new UserChooserFrame(pass.getId());
+						frame.setVisible(true);
+					}
+				});
 			}
 		}
 	}

@@ -43,13 +43,17 @@ public class EntryService {
 	@POST
 	@Path("/ticket/{userId}")
 	public Response enterWithTicket(@PathParam("userId") long userId) {
-		User user;
-		try {
-			user = userManager.getUserById(userId);
-		} catch (NoSuchUserException e) {
-			return Response.status(Response.Status.BAD_REQUEST).entity("No user found for id.").build();
+		if (userId == -1) {
+			entryManager.guestEntry();
+		} else {
+			User user;
+			try {
+				user = userManager.getUserById(userId);
+			} catch (NoSuchUserException e) {
+				return Response.status(Response.Status.BAD_REQUEST).entity("No user found for id.").build();
+			}
+			entryManager.enterWithTicket(user);
 		}
-		entryManager.enterWithTicket(user);
 		return Response.status(Response.Status.OK).build();
 	}
 
@@ -75,6 +79,35 @@ public class EntryService {
 			return Response.status(Response.Status.BAD_REQUEST).entity("Pass expired!").build();
 		} catch (NoMoreTimesOnPassException e) {
 			return Response.status(Response.Status.BAD_REQUEST).entity("No more times on pass!").build();
+		}
+		return Response.status(Response.Status.OK).build();
+	}
+
+	@POST
+	@Path("/multipass/{passId}")
+	public Response enterWithPass(@PathParam("passId") long passId, List<User> users) {
+		Pass pass;
+		try {
+			pass = passManager.getPass(passId);
+			if (pass.getTimeLeft() < users.size()) {
+				return Response.status(Response.Status.BAD_REQUEST).entity("Not enough times left").build();
+			} else {
+				for (User user : users) {
+					try {
+						if (user.getId() == -1) {
+							entryManager.guestEntryWithPass(pass);
+						} else {
+							entryManager.enterWithPass(user, pass);
+						}
+					} catch (PassExpiredException e) {
+						return Response.status(Response.Status.BAD_REQUEST).entity("Pass expired!").build();
+					} catch (NoMoreTimesOnPassException e) {
+						return Response.status(Response.Status.BAD_REQUEST).entity("No more times on pass!").build();
+					}
+				}
+			}
+		} catch (NoSuchPassException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("No pass found for id.").build();
 		}
 		return Response.status(Response.Status.OK).build();
 	}

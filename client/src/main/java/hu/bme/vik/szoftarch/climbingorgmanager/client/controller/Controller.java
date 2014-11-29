@@ -21,6 +21,7 @@ import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditUserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.LoginFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.MainFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.PassChooserFrame;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.UserChooserFrame;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
 import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
@@ -151,6 +152,10 @@ public class Controller {
 		this.token = null;
 	}
 
+	public List<User> getUsers() {
+		return users;
+	}
+
 	public void loadUsers() {
 		callGetService("users", new ResponseProcessor() {
 			@Override
@@ -225,10 +230,6 @@ public class Controller {
 		int validMonths = 0;
 		int timeLeft = 0;
 		switch (passId) {
-			case 1:
-				validMonths = 0;
-				timeLeft = 0;
-				break;
 			case 2:
 				validMonths = 2;
 				timeLeft = 10;
@@ -346,7 +347,11 @@ public class Controller {
 	}
 
 	public void enterWithTicket() {
-		String path = "entries/ticket/" + selectedUser.getId();
+		enterWithTicket(selectedUser.getId());
+	}
+
+	public void enterWithTicket(long userId) {
+		String path = "entries/ticket/" + userId;
 		callPostService(path, null, new ResponseProcessor() {
 			@Override
 			public void processResponse(Response response) {
@@ -371,6 +376,20 @@ public class Controller {
 						if (userId != -1) {
 							loadPassesForSelectedUser();
 						}
+					}
+				});
+	}
+
+	public void enterWithPass(final UserChooserFrame source, List<User> selectedUsers, long passId) {
+		String path = "entries/multipass/" + passId;
+		callPostService(source, path, Entity.entity(selectedUsers, MediaType.APPLICATION_JSON_TYPE),
+				new ResponseProcessor() {
+					@Override
+					public void processResponse(Response response) {
+						loadEntries();
+						loadPassesForSelectedUser();
+						JOptionPane.showMessageDialog(source, "Pass used!", "Success", JOptionPane.INFORMATION_MESSAGE);
+						source.dispose();
 					}
 				});
 	}
