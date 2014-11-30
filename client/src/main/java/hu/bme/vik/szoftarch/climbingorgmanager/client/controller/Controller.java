@@ -1,41 +1,24 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.client.controller;
 
+import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.ChangeListener;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.*;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
+import hu.bme.vik.szoftarch.climbingorgmanager.client.util.GsonMessageBodyHandler;
+import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.*;
+
+import javax.swing.*;
+import javax.ws.rs.client.*;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.ws.rs.client.AsyncInvoker;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import hu.bme.vik.szoftarch.climbingorgmanager.client.controller.listeners.ChangeListener;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditEquipmentFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.EditUserFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.LoginFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.MainFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.PassChooserFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.gui.frame.UserChooserFrame;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EntriesTableModel;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.EquipmentTableModel;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel.UserTableModel;
-import hu.bme.vik.szoftarch.climbingorgmanager.client.util.GsonMessageBodyHandler;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Entry;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Equipment;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.EquipmentType;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Pass;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Rental;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.Token;
-import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 
 /**
  * Created by Dani on 2014.11.20..
@@ -44,7 +27,7 @@ public class Controller {
 
 	//	private static final String SERVER_URL = "http://climbingorgmanager-asztalosdani.rhcloud.com";
 //	private static final String SERVER_URL = "http://localhost:8082";
-	private static String SERVER_URL;
+	private static String SERVER_URL = "http://localhost:8082";
 
 	private static Controller instance;
 
@@ -61,6 +44,10 @@ public class Controller {
 
 	private List<ChangeListener> changeListeners;
 
+	private Controller() {
+		changeListeners = new LinkedList<>();
+	}
+
 	public static Controller getInstance() {
 		if (instance == null) {
 			instance = new Controller();
@@ -68,16 +55,13 @@ public class Controller {
 		return instance;
 	}
 
-	private Controller() {
-		changeListeners = new LinkedList<>();
-	}
-
 	public static void main(String[] args) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader("config.txt"));
 			SERVER_URL = reader.readLine();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("Fallback to default server url: " + SERVER_URL);
+			;
 		}
 		getInstance();
 		LoginFrame loginFrame = new LoginFrame();
@@ -93,6 +77,10 @@ public class Controller {
 		}
 	}
 
+	public User getSelectedUser() {
+		return selectedUser;
+	}
+
 	public void setSelectedUser(User selectedUser) {
 		this.selectedUser = selectedUser;
 		for (ChangeListener listener : changeListeners) {
@@ -102,10 +90,6 @@ public class Controller {
 			getActiveRentalsForUser();
 			loadPassesForSelectedUser();
 		}
-	}
-
-	public User getSelectedUser() {
-		return selectedUser;
 	}
 
 	public void addChangeListener(ChangeListener listener) {

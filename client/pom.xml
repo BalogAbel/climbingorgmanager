@@ -19,7 +19,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>hu.bme.vik.szoftarch.climbingorgmanager.client.gui.MainFrame</mainClass>
+							<mainClass>hu.bme.vik.szoftarch.climbingorgmanager.client.controller.Controller</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
