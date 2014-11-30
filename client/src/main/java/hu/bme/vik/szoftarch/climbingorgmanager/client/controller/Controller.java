@@ -1,5 +1,8 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.client.controller;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,7 +43,8 @@ import hu.bme.vik.szoftarch.climbingorgmanager.core.entities.User;
 public class Controller {
 
 	//	private static final String SERVER_URL = "http://climbingorgmanager-asztalosdani.rhcloud.com";
-	private static final String SERVER_URL = "http://localhost:8082";
+//	private static final String SERVER_URL = "http://localhost:8082";
+	private static String SERVER_URL;
 
 	private static Controller instance;
 
@@ -66,6 +70,18 @@ public class Controller {
 
 	private Controller() {
 		changeListeners = new LinkedList<>();
+	}
+
+	public static void main(String[] args) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader("config.txt"));
+			SERVER_URL = reader.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		getInstance();
+		LoginFrame loginFrame = new LoginFrame();
+		loginFrame.setVisible(true);
 	}
 
 	public void setSelectedUser(long id) {

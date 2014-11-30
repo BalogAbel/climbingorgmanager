@@ -1,5 +1,7 @@
 package hu.bme.vik.szoftarch.climbingorgmanager.client.tablemodel;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,7 +49,8 @@ public class EntriesTableModel extends AbstractTableModel {
 		Pass pass = entry.getPass();
 		switch (columnIndex) {
 			case 0:
-				return entry.getEnteredOn();
+				DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+				return df.format(entry.getEnteredOn());
 			case 1:
 				User user = entry.getUser();
 				if (user == null) {

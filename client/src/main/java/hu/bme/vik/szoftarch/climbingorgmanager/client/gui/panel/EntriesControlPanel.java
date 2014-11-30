@@ -10,6 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -112,10 +114,12 @@ public class EntriesControlPanel extends JPanel implements ActionListener {
 		constraints.gridy = 0;
 		datePanel.add(fromLabel, constraints);
 
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		fromPicker = new JXDatePicker(new Date());
 		constraints.gridx = 1;
 		datePanel.add(fromPicker, constraints);
 		fromPicker.getEditor().setColumns(8);
+		fromPicker.setFormats(df);
 		fromPicker.addActionListener(this);
 
 		JLabel toLabel = new JLabel("To");
@@ -127,6 +131,7 @@ public class EntriesControlPanel extends JPanel implements ActionListener {
 		constraints.gridx = 1;
 		datePanel.add(toPicker, constraints);
 		toPicker.getEditor().setColumns(8);
+		toPicker.setFormats(df);
 		toPicker.addActionListener(this);
 
 		JButton todayButton = new JButton("Today");
