@@ -144,6 +144,10 @@ public class UserManager implements Serializable {
 		query.setParameter("user", user);
 		query.executeUpdate();
 
+		query = entityManager.createQuery("delete from Token t where t.user = :user");
+		query.setParameter("user", user);
+		query.executeUpdate();
+
 		query = entityManager.createQuery("update Entry set user = null where user = :user");
 		query.setParameter("user", user);
 		query.executeUpdate();

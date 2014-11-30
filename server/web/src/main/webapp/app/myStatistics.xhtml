@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	  xmlns:h="http://java.sun.com/jsf/html"
-	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui">
+	  xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+	  xmlns:f="http://xmlns.jcp.org/jsf/core">
 <h:body>
 
 	<ui:composition template="/WEB-INF/template/template.xhtml">
@@ -12,6 +13,33 @@
 
 			<h3>Entries</h3>
 			<p:chart type="line" model="#{myStatisticsBean.entriesModel}"/>
+
+			<h3>Passes</h3>
+			<p:dataTable id="passes" widgetVar="passesTable" var="pass"
+						 value="#{myStatisticsBean.passes}"
+						 resizableColumns="true" liveResize="true"
+						 rows="10" paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom"
+						 selectionMode="single" selection="#{enterBean.selectedPass}"
+						 rowKey="#{pass.id}">
+
+				<p:column headerText="Time left">
+					<h:outputText value="#{pass.timeLeft}"/>
+				</p:column>
+
+				<p:column headerText="Valid until">
+					<h:outputText value="#{pass.validUntil}">
+						<f:convertDateTime pattern="yyyy. MM. dd. HH:mm"/>
+					</h:outputText>
+				</p:column>
+
+				<p:column headerText="Bought on">
+					<h:outputText value="#{pass.validUntil}">
+						<f:convertDateTime pattern="yyyy. MM. dd. HH:mm"/>
+					</h:outputText>
+				</p:column>
+
+			</p:dataTable>
+
 		</ui:define>
 	</ui:composition>
 
